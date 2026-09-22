@@ -14,6 +14,8 @@ test('one high day has low confidence and cannot create calorie debt', () => {
   const plan = generateTomorrowCateringPlan({ profile, rollingState: state, menus, now: new Date('2026-09-22T10:00:00Z') });
   assert.equal(state.confidence, 'LOW');
   assert.equal(plan.effectiveDailyTarget, plan.baseDailyTarget);
+  assert.equal(plan.dinner, null);
+  assert.ok(plan.lunch);
   assert.ok(plan.explanationCodes.includes('INSUFFICIENT_LOGGING'));
 });
 
