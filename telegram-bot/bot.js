@@ -1,6 +1,5 @@
 import "dotenv/config";
 import { Telegraf, Markup } from "telegraf";
-import { analyzeFoodPhoto, analyzeFoodText } from "./gemini.js";
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
 if (!token) throw new Error("TELEGRAM_BOT_TOKEN belum dikonfigurasi.");
@@ -13,35 +12,36 @@ const pending = new Map();
 const editing = new Map();
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 
-function apiHeaders() {
+function apiHeaders(telegramUserId) {
   if (!apiToken) throw new Error("CALORA_WEBHOOK_TOKEN belum dikonfigurasi.");
-  return { "Content-Type": "application/json", Authorization: `Bearer ${apiToken}` };
+  return {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${apiToken}`,
+    "X-Telegram-User-Id": String(telegramUserId)
+  };
 }
 
-async function readLogs(telegramUserId) {
-  const response = await fetch(`${apiUrl}/api/telegram/food?telegramUserId=${encodeURIComponent(telegramUserId)}`, { headers: apiHeaders() });
-  if (!response.ok) throw new Error(`Calora API HTTP ${response.status}`);
-  return response.json();
-}
-
-async function saveLog(entry, telegramUserId) {
-  const response = await fetch(`${apiUrl}/api/telegram/food`, {
-    method: "POST",
-    headers: apiHeaders(),
-    body: JSON.stringify({ telegramUserId, food: { ...entry, meal: entry.mealName, source: entry.source || "AI_ESTIMATE" } })
+async function api(path, telegramUserId, options = {}) {
+  const response = await fetch(`${apiUrl}${path}`, {
+    ...options,
+    headers: { ...apiHeaders(telegramUserId), ...(options.headers || {}) }
   });
-  if (!response.ok) throw new Error((await response.json()).error || `Calora API HTTP ${response.status}`);
-  return response.json();
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) throw Object.assign(new Error(payload.error || `Calora API HTTP ${response.status}`), { status: response.status });
+  return payload;
 }
 
 async function ensureConnected(ctx) {
-  const response = await fetch(`${apiUrl}/api/telegram/food?telegramUserId=${encodeURIComponent(ctx.from.id)}`, { headers: apiHeaders() });
-  if (response.ok) return true;
-  if (response.status === 404) {
-    await ctx.reply("Akun Telegram ini belum terhubung. Buka Calora → Nutrition Profile → Connect Telegram, lalu tekan Start dari link tersebut.");
-    return false;
+  try {
+    await api("/api/telegram/status", ctx.from.id);
+    return true;
+  } catch (error) {
+    if (error.status === 404) {
+      await ctx.reply("Akun Telegram ini belum terhubung. Buka Calora → Nutrition Profile → Connect Telegram, lalu tekan Start dari link tersebut.");
+      return false;
+    }
+    throw error;
   }
-  throw new Error(`Calora API HTTP ${response.status}`);
 }
 
 async function showAnalysis(ctx, analysis, source) {
@@ -60,23 +60,28 @@ bot.use(async (ctx, next) => {
 
 bot.start(async (ctx) => {
   if (ctx.startPayload?.startsWith("bind_")) {
-    const response = await fetch(`${apiUrl}/api/telegram/bind`, { method: "POST", headers: apiHeaders(), body: JSON.stringify({ token: ctx.startPayload.slice(5), telegramUserId: ctx.from.id }) });
-    if (!response.ok) return ctx.reply((await response.json()).error || "Link koneksi tidak valid.");
-    return ctx.reply("Telegram berhasil terhubung ke akun Calora Anda. Sekarang kirim foto makanan untuk dicatat.");
+    try {
+      await fetch(`${apiUrl}/api/telegram/bind`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiToken}` },
+        body: JSON.stringify({ token: ctx.startPayload.slice(5), telegramUserId: ctx.from.id })
+      }).then(async (response) => {
+        const payload = await response.json();
+        if (!response.ok) throw new Error(payload.error || "Link koneksi tidak valid.");
+      });
+      return ctx.reply("Telegram berhasil terhubung ke akun Calora Anda. Sekarang kirim foto makanan untuk dicatat.");
+    } catch (error) {
+      return ctx.reply(error.message);
+    }
   }
   return ctx.reply("Buka Calora → Integrations untuk menghubungkan akun ini. Setelah terhubung, kirim foto makanan atau label nutrisi.");
 });
 
 bot.command("gizi", async (ctx) => {
   if (!(await ensureConnected(ctx))) return;
-  const today = new Date().toISOString().slice(0, 10);
-  const entries = (await readLogs(ctx.from.id)).filter((item) => String(item.createdAt || "").startsWith(today));
-  if (!entries.length) return ctx.reply("Belum ada makanan tercatat hari ini.");
-  const total = entries.reduce((acc, item) => ({
-    kcal: acc.kcal + Number(item.kcal || 0), protein: acc.protein + Number(item.protein || 0),
-    carbs: acc.carbs + Number(item.carbs || 0), fat: acc.fat + Number(item.fat || 0)
-  }), { kcal: 0, protein: 0, carbs: 0, fat: 0 });
-  return ctx.reply(`Log hari ini: ${entries.length} item\n🔥 ${total.kcal} kcal\n🥩 Protein ${total.protein}g | Karbo ${total.carbs}g | Lemak ${total.fat}g`);
+  const summary = await api("/api/food/summary", ctx.from.id);
+  if (!summary.count) return ctx.reply("Belum ada makanan tercatat hari ini.");
+  return ctx.reply(`Log hari ini: ${summary.count} item\n🔥 ${summary.kcal} kcal\n🥩 Protein ${summary.protein}g | Karbo ${summary.carbs}g | Lemak ${summary.fat}g`);
 });
 
 bot.on("photo", async (ctx) => {
@@ -89,8 +94,11 @@ bot.on("photo", async (ctx) => {
     if (!response.ok) throw new Error("Gagal mengunduh foto Telegram.");
     const image = Buffer.from(await response.arrayBuffer());
     if (image.length > MAX_IMAGE_BYTES) throw new Error("Foto terlalu besar. Maksimum 5 MB.");
-    const analysis = await analyzeFoodPhoto(image, "image/jpeg", ctx.message.caption || "");
-    await showAnalysis(ctx, analysis, "PHOTO_ESTIMATE");
+    const analysis = await api("/api/analyze", ctx.from.id, {
+      method: "POST",
+      body: JSON.stringify({ imageBase64: image.toString("base64"), mimeType: "image/jpeg", caption: ctx.message.caption || "" })
+    });
+    await showAnalysis(ctx, analysis, analysis.source || "PHOTO_ESTIMATE");
   } catch (error) {
     console.error(error);
     await ctx.reply(`Foto tidak bisa dianalisis: ${error.message}`);
@@ -112,7 +120,8 @@ bot.on("text", async (ctx, next) => {
     try {
       if (!(await ensureConnected(ctx))) return;
       await ctx.reply("Menganalisis deskripsi makanan...");
-      return showAnalysis(ctx, await analyzeFoodText(ctx.message.text), "TEXT_ESTIMATE");
+      const analysis = await api("/api/analyze", ctx.from.id, { method: "POST", body: JSON.stringify({ text: ctx.message.text }) });
+      return showAnalysis(ctx, analysis, analysis.source || "TEXT_ESTIMATE");
     } catch (error) {
       console.error(error);
       return ctx.reply(`Deskripsi tidak bisa dianalisis: ${error.message}`);
@@ -135,7 +144,10 @@ bot.on("text", async (ctx, next) => {
 bot.action(/^save_food:(.+)$/, async (ctx) => {
   const entry = pending.get(ctx.match[1]);
   if (!entry || entry.telegramUserId !== ctx.from.id) return ctx.answerCbQuery("Sesi sudah kedaluwarsa.");
-  await saveLog(entry, ctx.from.id);
+  await api("/api/food", ctx.from.id, {
+    method: "POST",
+    body: JSON.stringify({ meal: entry.mealName, kcal: entry.kcal, protein: entry.protein, carbs: entry.carbs, fat: entry.fat, sugar: entry.sugar, sodium: entry.sodium, source: entry.source || "AI_ESTIMATE", confidence: entry.confidence })
+  });
   pending.delete(ctx.match[1]);
   await ctx.answerCbQuery("Tersimpan.");
   await ctx.editMessageText(`Tersimpan di CaloraAI: ${entry.mealName} (${entry.kcal || 0} kcal).`);
