@@ -1,0 +1,39 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: calora
+      POSTGRES_PASSWORD: calora
+      POSTGRES_DB: calora
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U calora -d calora"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: .
+    ports:
+      - "3005:3005"
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://calora:calora@postgres:5432/calora
+      PORT: 3005
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  bot:
+    build: ./telegram-bot
+    env_file: .env
+    environment:
+      CALORA_API_URL: http://api:3005
+    depends_on:
+      - api
+
+volumes:
+  pgdata:
