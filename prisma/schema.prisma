@@ -1,0 +1,215 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id
+  name         String
+  email        String?
+  passwordHash String   @map("password_hash")
+  role         String
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  profile            NutritionProfile?
+  foodLogs           FoodLog[]
+  weightLogs         WeightLog[]
+  activityLogs       ActivityLog[]
+  adaptivePlans      AdaptivePlan[]
+  telegramConnection TelegramConnection?
+  bindTokens         TelegramBindToken[]
+  sessions           Session[]
+  auditEvents        AuditEvent[]        @relation("AuditSubject")
+  actorEvents        AuditEvent[]        @relation("AuditActor")
+
+  @@unique([name])
+  @@unique([email])
+  @@map("users")
+}
+
+model NutritionProfile {
+  userId             String   @id @map("user_id")
+  age                Float
+  sex                String
+  heightCm           Float    @map("height_cm")
+  weightKg           Float    @map("weight_kg")
+  activityLevel      String   @map("activity_level")
+  goalType           String   @map("goal_type")
+  targetWeightKg     Float?   @map("target_weight_kg")
+  rateKgPerWeek      Float    @default(0.25) @map("rate_kg_per_week")
+  dietaryPreference  String   @default("none") @map("dietary_preference")
+  allergies          String   @default("")
+  dislikedFoods      String   @default("") @map("disliked_foods")
+  timezone           String   @default("Asia/Bangkok")
+  version            Int      @default(1)
+  updatedAt          DateTime @updatedAt @map("updated_at")
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("nutrition_profiles")
+}
+
+model FoodLog {
+  id         String   @id
+  userId     String   @map("user_id")
+  mealType   String   @map("meal_type")
+  foodName   String   @map("food_name")
+  quantity   String?
+  calories   Float
+  proteinG   Float    @default(0) @map("protein_g")
+  carbsG     Float    @default(0) @map("carbs_g")
+  fatG       Float    @default(0) @map("fat_g")
+  sugarG     Float    @default(0) @map("sugar_g")
+  sodiumMg   Float    @default(0) @map("sodium_mg")
+  source     String
+  confidence Float?
+  eatenAt    DateTime @map("eaten_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, eatenAt])
+  @@map("food_logs")
+}
+
+model WeightLog {
+  id         String   @id
+  userId     String   @map("user_id")
+  weightKg   Float    @map("weight_kg")
+  measuredAt DateTime @map("measured_at")
+  source     String
+  createdAt  DateTime @default(now()) @map("created_at")
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, measuredAt])
+  @@map("weight_logs")
+}
+
+model ActivityLog {
+  id                    String   @id
+  userId                String   @map("user_id")
+  provider              String
+  providerActivityId    String?  @map("provider_activity_id")
+  activityType          String   @map("activity_type")
+  activityName          String?  @map("activity_name")
+  startedAt             DateTime @map("started_at")
+  durationSeconds       Int?     @map("duration_seconds")
+  distanceMeters        Float?   @map("distance_meters")
+  estimatedEnergyKcal   Float?   @map("estimated_energy_kcal")
+  energySource          String?  @map("energy_source")
+  dataQuality           String   @map("data_quality")
+  rawProviderReference  String?  @map("raw_provider_reference")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, provider, providerActivityId])
+  @@map("activity_logs")
+}
+
+model Menu {
+  id                 String          @id
+  name               String
+  mealType           String          @map("meal_type")
+  calories           Float
+  proteinG           Float           @map("protein_g")
+  carbsG             Float           @map("carbs_g")
+  fatG               Float           @map("fat_g")
+  allergens          Json            @map("allergens_json")
+  dietaryTags        Json            @map("dietary_tags_json")
+  inventoryAvailable Int             @map("inventory_available")
+  servingSize        String          @map("serving_size")
+  active             Boolean         @default(true)
+  meals              CateringMeal[]
+
+  @@map("menus")
+}
+
+model AdaptivePlan {
+  id                        String          @id
+  userId                    String          @map("user_id")
+  planDate                  String          @map("plan_date")
+  generatedAt               DateTime        @map("generated_at")
+  baseDailyCalorieTarget    Float           @map("base_daily_calorie_target")
+  effectiveDailyCalorieTarget Float         @map("effective_daily_calorie_target")
+  cateringCalorieAllocation Float           @map("catering_calorie_allocation")
+  proteinTargetG            Float           @map("protein_target_g")
+  carbsTargetG              Float           @map("carbs_target_g")
+  fatTargetG                Float           @map("fat_target_g")
+  confidence                String
+  stateVersion              String          @map("state_version")
+  engineVersion             String          @map("engine_version")
+  explanationCodes          Json            @map("explanation_codes_json")
+  status                    String
+  inputSnapshot             Json            @map("input_snapshot_json")
+  user                      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  meals                     CateringMeal[]
+
+  @@unique([userId, planDate])
+  @@map("adaptive_plans")
+}
+
+model CateringMeal {
+  id             String       @id
+  adaptivePlanId String       @map("adaptive_plan_id")
+  mealType       String       @map("meal_type")
+  menuId         String?      @map("menu_id")
+  calories       Float
+  proteinG       Float        @map("protein_g")
+  carbsG         Float        @map("carbs_g")
+  fatG           Float        @map("fat_g")
+  status         String
+  plan           AdaptivePlan @relation(fields: [adaptivePlanId], references: [id], onDelete: Cascade)
+  menu           Menu?        @relation(fields: [menuId], references: [id])
+
+  @@map("catering_meals")
+}
+
+model TelegramConnection {
+  userId         String   @id @map("user_id")
+  telegramUserId String   @unique @map("telegram_user_id")
+  connectedAt    DateTime @default(now()) @map("connected_at")
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("telegram_connections")
+}
+
+model TelegramBindToken {
+  tokenHash String    @id @map("token_hash")
+  userId    String    @map("user_id")
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("telegram_bind_tokens")
+}
+
+model AuditEvent {
+  id          String   @id
+  userId      String?  @map("user_id")
+  actorUserId String?  @map("actor_user_id")
+  eventType   String   @map("event_type")
+  entityType  String?  @map("entity_type")
+  entityId    String?  @map("entity_id")
+  detail      Json     @map("detail_json")
+  createdAt   DateTime @default(now()) @map("created_at")
+  user        User?    @relation("AuditSubject", fields: [userId], references: [id])
+  actor       User?    @relation("AuditActor", fields: [actorUserId], references: [id])
+
+  @@map("audit_events")
+}
+
+model Session {
+  id        String   @id
+  userId    String   @map("user_id")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([expiresAt])
+  @@map("sessions")
+}
