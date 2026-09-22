@@ -6,5 +6,7 @@ data/*.sqlite*
 
 # Local tooling
 node_modules/
+dist/
+css/app.css
 .env
 .DS_Store

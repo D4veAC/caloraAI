@@ -1,12 +1,45 @@
 {
   "name": "caloraai",
   "private": true,
-  "version": "1.1.0",
+  "version": "2.0.0",
   "scripts": {
-    "start": "node server.js",
-    "test": "node --test"
+    "start": "node dist/main.js",
+    "start:dev": "tsc -p tsconfig.build.json --watch",
+    "build": "tsc -p tsconfig.build.json && npm run css:build",
+    "css:build": "tailwindcss -i ./css/input.css -o ./css/app.css",
+    "css:watch": "tailwindcss -i ./css/input.css -o ./css/app.css --watch",
+    "test": "tsc -p tsconfig.build.json && node --import tsx --test --test-reporter=spec test/*.test.mjs",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate deploy",
+    "prisma:seed": "tsx prisma/seed.ts"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "engines": {
     "node": ">=22.5"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.1.6",
+    "@nestjs/config": "^4.0.2",
+    "@nestjs/core": "^11.1.6",
+    "@nestjs/platform-express": "^11.1.6",
+    "@prisma/client": "^6.16.2",
+    "cookie-parser": "^1.4.7",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.10",
+    "@nestjs/testing": "^11.1.6",
+    "@tailwindcss/cli": "^4.1.13",
+    "@types/cookie-parser": "^1.4.9",
+    "@types/express": "^5.0.3",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^24.5.2",
+    "prisma": "^6.16.2",
+    "tailwindcss": "^4.1.13",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2"
   }
 }
