@@ -1,0 +1,7 @@
+services:
+  caloraai-telegram-bot:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      CALORA_API_URL: http://host.docker.internal:3005

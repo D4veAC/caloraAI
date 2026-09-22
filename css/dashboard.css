@@ -1,0 +1,442 @@
+/* ==========================================================================
+   FITVAULT — Dashboard Layout & Bento Cards (Outer Borders Removed)
+   ========================================================================== */
+
+.dash-masthead {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 36px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid rgba(247, 241, 232, 0.08);
+}
+
+.dash-eyebrow {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-faint);
+  margin-bottom: 6px;
+}
+
+.dash-greeting-h1 {
+  font-size: 44px;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.dash-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Row 1 — Food Hero + Training Hero */
+.dash-hero-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.dash-kcal-card {
+  background: var(--surface);
+  border: none;
+  border-radius: var(--r-lg);
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.dash-card-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-faint);
+  margin-bottom: 12px;
+}
+
+.dash-kcal-numbers {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.dash-kcal-main {
+  font-size: 60px;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.dash-kcal-unit {
+  font-size: 16px;
+  color: var(--ink-muted);
+}
+
+.dash-kcal-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.dash-kcal-bar-track {
+  flex: 1;
+  height: 4px;
+  background: rgba(247, 241, 232, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.dash-kcal-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--ink);
+  border-radius: 2px;
+  transition: width 0.7s var(--ease-spring);
+}
+
+.dash-kcal-pct {
+  font-size: 12px;
+  color: var(--ink-muted);
+  min-width: 34px;
+  text-align: right;
+}
+
+.dash-kcal-target-label {
+  font-size: 12px;
+  color: var(--ink-faint);
+}
+
+/* Training Hero Card */
+.dash-train-card {
+  background: var(--surface);
+  border: none;
+  border-radius: var(--r-lg);
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  transition: transform var(--t-fast) var(--ease-base), background var(--t-fast);
+}
+
+.dash-train-card:hover {
+  background: var(--surface-2);
+  transform: translateY(-2px);
+}
+
+.dash-train-stats {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin: 16px 0 12px;
+}
+
+.dash-train-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dash-train-stat-val {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1;
+}
+
+.dash-train-stat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
+}
+
+.dash-train-stat-divider {
+  width: 1px;
+  height: 28px;
+  background: rgba(247, 241, 232, 0.08);
+  flex-shrink: 0;
+}
+
+/* Row 2 — Macro column + Workout tiles */
+.dash-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+  align-items: stretch;
+}
+
+.dash-macro-col {
+  background: var(--surface);
+  border: none;
+  border-radius: var(--r-lg);
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.dash-macro-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dash-macro-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.dash-macro-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-muted);
+}
+
+.dash-macro-val {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.dash-macro-track {
+  height: 3px;
+  background: rgba(247, 241, 232, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.dash-macro-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 2px;
+  transition: width 0.7s var(--ease-spring);
+}
+
+.dash-macro-fill--p { background: #7ab5a0; }
+.dash-macro-fill--c { background: #c9a96e; }
+.dash-macro-fill--f { background: #c47d6a; }
+.dash-macro-fill--s { background: #a07ab5; }
+
+.dash-wk-tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.dash-tile {
+  background: var(--surface);
+  border: none;
+  border-radius: var(--r-lg);
+  padding: 20px 22px;
+  cursor: default;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  transition: background var(--t-fast), transform var(--t-fast);
+}
+
+.dash-tile[onclick] { cursor: pointer; }
+.dash-tile[onclick]:hover {
+  background: var(--surface-2);
+  transform: translateY(-2px);
+}
+
+.dash-tile-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--ink-faint);
+  margin-bottom: 8px;
+}
+
+.dash-tile-val {
+  font-size: 28px;
+  font-weight: 300;
+  line-height: 1.1;
+  margin-bottom: 4px;
+  color: var(--ink);
+}
+
+.dash-tile-sub {
+  font-size: 11px;
+  color: var(--ink-muted);
+}
+
+/* Row 3 — Bottom Split Preview Grid */
+.dash-bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.dash-adaptive-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.dash-adaptive-card {
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  padding: 24px 28px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.dash-adaptive-card h2 {
+  font-size: 30px;
+  margin-bottom: 8px;
+}
+
+.dash-adaptive-target {
+  color: var(--ink);
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.dash-remaining-macros {
+  color: var(--ink-faint);
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.dash-catering {
+  margin-bottom: 16px;
+  padding: 28px;
+  border-radius: var(--r-lg);
+  background: linear-gradient(135deg, rgba(184, 255, 44, 0.1), var(--surface));
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.dash-catering-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 22px;
+}
+
+.dash-catering-head h2 { font-size: clamp(24px, 4vw, 36px); }
+
+.dash-catering-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.dash-catering-grid > div {
+  padding: 16px;
+  border-radius: var(--r-md);
+  background: rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dash-catering-grid span,
+.dash-catering-grid small { color: var(--ink-muted); font-size: 12px; }
+.dash-catering-grid strong { color: var(--ink); font-size: 16px; line-height: 1.35; }
+.dash-catering-adjustment { margin-top: 16px; color: var(--accent); font-size: 13px; text-transform: capitalize; }
+.dash-why-card { margin-bottom: 20px; }
+.dash-why-card .dash-insight + .dash-insight { margin-top: 12px; }
+
+@media (max-width: 760px) {
+  .dash-catering-grid { grid-template-columns: 1fr 1fr; }
+  .dash-catering-head { flex-direction: column; }
+}
+
+@media (max-width: 420px) {
+  .dash-catering-grid { grid-template-columns: 1fr; }
+}
+
+.dash-adaptive-suggestion,
+.dash-insight {
+  color: var(--ink-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+@media (max-width: 760px) {
+  .dash-masthead { align-items: flex-start; gap: 20px; }
+  .dash-masthead, .dash-actions { flex-direction: column; }
+  .dash-actions { width: 100%; }
+  .dash-actions .btn { width: 100%; }
+  .dash-hero-row, .dash-row-2, .dash-adaptive-row, .dash-bottom-row { grid-template-columns: 1fr; }
+  .dash-kcal-main { font-size: 48px; }
+  .dash-greeting-h1 { font-size: 38px; }
+}
+
+.dash-section {
+  background: var(--surface);
+  border: none;
+  border-radius: var(--r-lg);
+  padding: 24px 28px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.dash-section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(247, 241, 232, 0.08);
+}
+
+.dash-section-link {
+  background: transparent;
+  border: none;
+  font-size: 12px;
+  color: var(--ink-muted);
+  cursor: pointer;
+  transition: color var(--t-fast);
+  font-family: inherit;
+}
+.dash-section-link:hover { color: var(--ink); }
+
+.dash-food-row, .dash-workout-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(247, 241, 232, 0.06);
+}
+
+.dash-food-row:last-child, .dash-workout-row:last-child {
+  border-bottom: none;
+}
+
+.dash-food-name, .dash-workout-name {
+  font-size: 14px;
+  color: var(--ink);
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.dash-food-meta, .dash-workout-meta {
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+.dash-food-kcal, .dash-workout-sets {
+  font-size: 14px;
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+
+.dash-empty-meals {
+  font-size: 14px;
+  color: var(--ink-faint);
+  padding: 20px 0;
+  text-align: center;
+}

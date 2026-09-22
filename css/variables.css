@@ -1,0 +1,55 @@
+/* ==========================================================================
+   FITVAULT — Design Tokens, Variables & Base Reset
+   ========================================================================== */
+
+:root {
+  --bg:          #111009;
+  --surface:     #1c1a17;
+  --surface-2:   #242118;
+  --border:      #2e2b26;
+  --border-2:    #3d3930;
+
+  --ink:         #f7f1e8;
+  --ink-muted:   #9c9488;
+  --ink-faint:   #4a4741;
+
+  --accent:      #d4c9b4;
+  --success:     #4caf78;
+  --danger:      #e05252;
+
+  --r-sm:  4px;
+  --r-md:  6px;
+  --r-lg:  12px;
+  --r-pill: 9999px;
+
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-base:   cubic-bezier(0.25, 1, 0.5, 1);
+  --t-fast: 200ms;
+  --t-base: 400ms;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: scroll; /* Force scrollbar to prevent layout stretch on load */
+  padding-top: 0;
+}
+
+.editorial {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}

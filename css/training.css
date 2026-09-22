@@ -1,0 +1,180 @@
+/* ==========================================================================
+   FITVAULT — Training & Workout View (Border-Free Surface Cards)
+   ========================================================================== */
+
+.sidebar-section {
+  background: var(--surface);
+  border: none;
+  border-radius: var(--r-lg);
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.sidebar-title {
+  font-size: 20px;
+  font-weight: 300;
+  margin-bottom: 16px;
+}
+
+.summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+
+.summary-row strong {
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.log-heading {
+  margin-bottom: 16px;
+}
+
+.log-title {
+  font-size: 24px;
+  font-weight: 300;
+}
+
+.timer-strip {
+  background: var(--surface);
+  border: none;
+  border-radius: var(--r-lg);
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.timer-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-muted);
+  margin-bottom: 4px;
+}
+
+.timer-val {
+  font-size: 32px;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.timer-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.exercise-card {
+  background: var(--surface);
+  border: none;
+  border-radius: var(--r-lg);
+  padding: 24px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.exercise-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.exercise-title {
+  font-size: 20px;
+  font-weight: 300;
+}
+
+.set-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+}
+
+.set-table th,
+.set-table td {
+  padding: 10px 12px;
+  text-align: left;
+  font-size: 13px;
+}
+
+.set-table th {
+  color: var(--ink-muted);
+  font-weight: 500;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid rgba(247, 241, 232, 0.08);
+}
+
+.set-table td {
+  border-bottom: 1px solid rgba(247, 241, 232, 0.04);
+}
+
+.set-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Trend analytics chart container */
+.trend-chart-card {
+  background: var(--surface);
+  border: none;
+  border-radius: var(--r-lg);
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.trend-chart-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.trend-chart-title {
+  font-size: 22px;
+  font-weight: 300;
+}
+
+.chart-filters {
+  display: flex;
+  gap: 6px;
+  background: var(--bg);
+  padding: 4px;
+  border-radius: var(--r-sm);
+}
+
+.chart-filter-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-muted);
+  font-size: 11px;
+  font-family: inherit;
+  padding: 4px 10px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: all var(--t-fast);
+}
+
+.chart-filter-btn.active {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+.chart-wrapper {
+  position: relative;
+  width: 100%;
+}

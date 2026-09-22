@@ -1,0 +1,10 @@
+# Runtime and personal health data are intentionally kept out of source control.
+food_logs.json
+data/webhook_workouts.json
+data/users/
+data/*.sqlite*
+
+# Local tooling
+node_modules/
+.env
+.DS_Store

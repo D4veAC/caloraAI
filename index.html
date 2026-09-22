@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Calora AI — Adaptive Nutrition</title>
+  <meta name="description" content="Personal workout and nutrition tracker.">
+
+  <!-- DM Sans + Cormorant Garamond -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap"
+    rel="stylesheet">
+
+  <!-- Three.js + GLTFLoader -->
+  <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+
+  <!-- Chart.js for Trend Analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <link rel="stylesheet" href="css/main.css?v=1.4.0">
+</head>
+
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-inner">
+      <div style="display:flex;align-items:center;gap:24px;">
+        <span class="nav-brand editorial" style="cursor:pointer;" onclick="switchTab('welcome')">Calora AI</span>
+        <div class="nav-tabs" id="nav-tabs-container">
+          <div class="nav-tab-indicator" id="nav-tab-indicator"></div>
+          <button class="nav-tab-btn" id="tab-dashboard-btn" onclick="switchTab('dashboard')">Dashboard</button>
+          <button class="nav-tab-btn" id="tab-training-btn" onclick="switchTab('training')">Workout</button>
+          <button class="nav-tab-btn" id="tab-nutrition-btn" onclick="switchTab('nutrition')">Food</button>
+          <button class="nav-tab-btn" id="tab-trends-btn" onclick="switchTab('trends')">Trends</button>
+        </div>
+      </div>
+      <div class="nav-right">
+        <div class="nav-user-badge">
+          <span class="user-name" id="nav-user-name">Guest</span>
+          <button class="btn btn-ghost btn-sm" id="nav-profile-button" type="button" onclick="openBodyStatsModal()">Profile</button>
+          <button class="btn btn-ghost btn-sm" id="nav-session-button" onclick="lockApp()"
+            style="margin-left:8px; padding:4px 10px;">Lock</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page">
+
+    <!-- TAB: WELCOME LANDING PAGE -->
+    <div class="tab-panel active" id="tab-welcome">
+      <section class="hero">
+        <canvas id="dash-bg-canvas" aria-hidden="true"></canvas>
+        <div class="hero-copy">
+          <h1 class="editorial hero-title">Know what<br>comes next.</h1>
+          <p class="hero-sub">Track what you eat. Understand the trend. Plan tomorrow's catering.</p>
+          <div style="margin-top: 36px;">
+            <button class="btn btn-fill btn-lg" onclick="openDashboardWithAuth()"
+              style="padding: 16px 36px; font-size: 16px; letter-spacing:0.02em;">Enter Dashboard →</button>
+          </div>
+        </div>
+
+        <!-- 3D Orbiting Object -->
+        <div id="canvas-container" title="Drag to rotate 360°"></div>
+      </section>
+    </div>
+
+    <!-- TAB: DASHBOARD -->
+    <div class="tab-panel" id="tab-dashboard">
+
+      <!-- MASTHEAD ROW -->
+      <div class="dash-masthead">
+        <div>
+          <p class="dash-eyebrow" id="dash-date-str"></p>
+          <h1 class="editorial dash-greeting-h1" id="dash-greeting">Calora user</h1>
+        </div>
+        <div class="dash-actions">
+          <button class="btn btn-ghost btn-sm" onclick="openFoodModal()">Log Food</button>
+          <button class="btn btn-fill btn-sm" onclick="switchTab('training')">Start Workout</button>
+        </div>
+      </div>
+
+      <!-- ROW 1: TWO HERO CARDS (Food + Training) -->
+      <div class="dash-hero-row">
+
+        <!-- CALORIE HERO -->
+        <div class="dash-kcal-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <p class="dash-card-label" style="margin-bottom:0;">Energy Today</p>
+            <span id="dash-rating-badge" class="rating-badge rating-na">Grade N/A</span>
+          </div>
+          <div class="dash-kcal-numbers">
+            <span class="editorial dash-kcal-main" id="dash-kcal-consumed">0</span>
+            <span class="dash-kcal-unit">kcal</span>
+          </div>
+          <div class="dash-kcal-bar-wrap">
+            <div class="dash-kcal-bar-track">
+              <div class="dash-kcal-bar-fill" id="dash-kcal-fill"></div>
+            </div>
+            <span class="dash-kcal-pct" id="dash-kcal-pct">0%</span>
+          </div>
+          <p class="dash-kcal-target-label" id="dash-kcal-target">of 2,100 kcal target</p>
+        </div>
+
+        <!-- TRAINING HERO -->
+        <div class="dash-train-card" onclick="switchTab('training')">
+          <p class="dash-card-label">Training This Week</p>
+          <div class="dash-kcal-numbers">
+            <span class="editorial dash-kcal-main" id="dash-wk-sessions">0</span>
+            <span class="dash-kcal-unit">sessions</span>
+          </div>
+          <div class="dash-train-stats">
+            <div class="dash-train-stat">
+              <span class="dash-train-stat-val" id="dash-wk-sets">0</span>
+              <span class="dash-train-stat-label">sets</span>
+            </div>
+            <div class="dash-train-stat-divider"></div>
+            <div class="dash-train-stat">
+              <span class="dash-train-stat-val" id="dash-wk-duration">0m</span>
+              <span class="dash-train-stat-label">duration</span>
+            </div>
+            <div class="dash-train-stat-divider"></div>
+            <div class="dash-train-stat">
+              <span class="dash-train-stat-val" id="dash-wk-exercises">0</span>
+              <span class="dash-train-stat-label">exercises</span>
+            </div>
+          </div>
+          <p class="dash-kcal-target-label" id="dash-last-session-label">No sessions this week</p>
+        </div>
+      </div>
+
+      <!-- ROW 2: MACRO BARS + WORKOUT TILES -->
+      <div class="dash-row-2">
+
+        <!-- MACRO BARS -->
+        <div class="dash-macro-col">
+          <div class="dash-macro-item">
+            <div class="dash-macro-top">
+              <span class="dash-macro-label">Protein</span>
+              <span class="dash-macro-val" id="dash-p-val">0g</span>
+            </div>
+            <div class="dash-macro-track">
+              <div class="dash-macro-fill dash-macro-fill--p" id="dash-p-fill"></div>
+            </div>
+          </div>
+          <div class="dash-macro-item">
+            <div class="dash-macro-top">
+              <span class="dash-macro-label">Carbs</span>
+              <span class="dash-macro-val" id="dash-c-val">0g</span>
+            </div>
+            <div class="dash-macro-track">
+              <div class="dash-macro-fill dash-macro-fill--c" id="dash-c-fill"></div>
+            </div>
+          </div>
+          <div class="dash-macro-item">
+            <div class="dash-macro-top">
+              <span class="dash-macro-label">Fat</span>
+              <span class="dash-macro-val" id="dash-f-val">0g</span>
+            </div>
+            <div class="dash-macro-track">
+              <div class="dash-macro-fill dash-macro-fill--f" id="dash-f-fill"></div>
+            </div>
+          </div>
+          <div class="dash-macro-item">
+            <div class="dash-macro-top">
+              <span class="dash-macro-label">Sugar</span>
+              <span class="dash-macro-val" id="dash-s-val">0g</span>
+            </div>
+            <div class="dash-macro-track">
+              <div class="dash-macro-fill dash-macro-fill--s" id="dash-s-fill"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- WORKOUT TILES (4 micro-stats) -->
+        <div class="dash-wk-tiles">
+          <div class="dash-tile" onclick="switchTab('training')">
+            <p class="dash-tile-label">Last Session</p>
+            <p class="editorial dash-tile-val" id="dash-tile-last-session">—</p>
+            <p class="dash-tile-sub" id="dash-tile-last-session-sub">No session logged</p>
+          </div>
+          <div class="dash-tile" onclick="switchTab('training')">
+            <p class="dash-tile-label">Sets Logged</p>
+            <p class="editorial dash-tile-val" id="dash-tile-sets">0</p>
+            <p class="dash-tile-sub">this week</p>
+          </div>
+          <div class="dash-tile" onclick="switchTab('nutrition')">
+            <p class="dash-tile-label">Meals Today</p>
+            <p class="editorial dash-tile-val" id="dash-tile-meals">0</p>
+            <p class="dash-tile-sub" id="dash-tile-meals-sub">entries logged</p>
+          </div>
+          <div class="dash-tile">
+            <p class="dash-tile-label">Remaining</p>
+            <p class="editorial dash-tile-val" id="dash-tile-remaining">2,100</p>
+            <p class="dash-tile-sub">kcal left today</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOMORROW'S CATERING -->
+      <section class="dash-catering" aria-labelledby="tomorrow-catering-title">
+        <div class="dash-catering-head">
+          <div>
+            <p class="dash-card-label">Primary adaptive output</p>
+            <h2 class="editorial" id="tomorrow-catering-title">Tomorrow's Catering</h2>
+          </div>
+          <span class="rating-badge" id="catering-confidence">Low confidence</span>
+        </div>
+        <div class="dash-catering-grid">
+          <div><span>Daily target</span><strong id="catering-daily-target">—</strong></div>
+          <div><span>Catering allocation</span><strong id="catering-allocation">—</strong></div>
+          <div><span>Lunch</span><strong id="catering-lunch">—</strong><small id="catering-lunch-macros"></small></div>
+          <div><span>Dinner</span><strong id="catering-dinner">—</strong><small id="catering-dinner-macros"></small></div>
+        </div>
+        <div class="dash-catering-adjustment" id="catering-adjustment">No adjustment yet.</div>
+      </section>
+
+      <section class="dash-adaptive-card dash-why-card">
+        <p class="dash-card-label">Why this changed</p>
+        <div id="catering-explanations"><p class="dash-insight">More logging is needed before Calora changes tomorrow's catering.</p></div>
+      </section>
+
+      <!-- ROW 3: TODAY'S MEALS + RECENT WORKOUTS -->
+      <div class="dash-bottom-row">
+        <div class="dash-section">
+          <div class="dash-section-head">
+            <h2 class="editorial" style="font-size:20px;">Today's Meals</h2>
+            <button class="dash-section-link" onclick="switchTab('nutrition')">Full Log →</button>
+          </div>
+          <div id="dash-food-preview"></div>
+        </div>
+        <div class="dash-section">
+          <div class="dash-section-head">
+            <h2 class="editorial" style="font-size:20px;">Recent Workouts</h2>
+            <button class="dash-section-link" onclick="switchTab('training')">All Sessions →</button>
+          </div>
+          <div id="dash-workout-preview"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB: TRENDS -->
+    <div class="tab-panel" id="tab-trends">
+      <div class="page-heading-row">
+        <div><p class="eyebrow">Rolling state</p><h1 class="editorial">7-day Trends</h1></div>
+      </div>
+      <div class="dash-catering-grid trends-grid">
+        <div><span>Average calories</span><strong id="trend-calories">—</strong></div>
+        <div><span>Average protein</span><strong id="trend-protein">—</strong></div>
+        <div><span>Logging completeness</span><strong id="trend-completeness">—</strong></div>
+        <div><span>Activity energy</span><strong id="trend-activity">—</strong><small>Estimated; not added 1:1 to food allowance</small></div>
+        <div><span>Weight trajectory</span><strong id="trend-weight">Not enough measurements</strong></div>
+        <div><span>Decision confidence</span><strong id="trend-confidence">Low</strong></div>
+      </div>
+      <form class="dash-adaptive-card trend-weight-form" onsubmit="saveWeightLog(event)">
+        <div><p class="dash-card-label">Weight check-in</p><h2 class="editorial">Add measurement</h2></div>
+        <div class="field"><label for="trend-weight-input">Weight (kg)</label><input id="trend-weight-input" type="number" min="30" max="350" step="0.1" required></div>
+        <button class="btn btn-fill" type="submit">Save weight</button>
+      </form>
+    </div>
+
+    <!-- TAB: TRAINING -->
+    <div class="tab-panel" id="tab-training">
+
+      <!-- WORKOUT FREQUENCY & INTENSITY ANALYTICS CARD -->
+      <div class="trend-chart-card" style="margin-bottom: 28px;">
+        <div class="trend-chart-head">
+          <div>
+            <h2 class="editorial trend-chart-title">Workout Volume & Sets</h2>
+          </div>
+          <div class="chart-filters">
+            <button class="chart-filter-btn active" id="wf-7d" onclick="updateWorkoutChart('7D')">7 Days</button>
+            <button class="chart-filter-btn" id="wf-30d" onclick="updateWorkoutChart('30D')">30 Days</button>
+          </div>
+        </div>
+        <div class="chart-wrapper" style="height: 240px;">
+          <canvas id="workout-frequency-chart"></canvas>
+        </div>
+      </div>
+
+      <div class="main-grid">
+
+        <!-- LEFT: Session + workout log -->
+        <div>
+          <!-- Live session timer -->
+          <div class="timer-strip">
+            <div>
+              <div class="timer-label">Active Session</div>
+              <div class="editorial timer-val" id="timer-display">00:00:00</div>
+            </div>
+            <div class="timer-actions">
+              <button class="btn btn-ghost" id="btn-timer-toggle" onclick="toggleTimer()">Start</button>
+              <button class="btn btn-fill" onclick="promptEndSession()">End Session</button>
+            </div>
+          </div>
+
+          <!-- Exercise log -->
+          <div class="log-heading"
+            style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+            <div>
+              <h2 class="editorial log-title">Workout Log</h2>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+              <div class="chart-filters">
+                <button class="chart-filter-btn active" id="wlf-all" onclick="setWorkoutLogFilter('ALL')">All</button>
+                <button class="chart-filter-btn" id="wlf-today" onclick="setWorkoutLogFilter('TODAY')">Today</button>
+                <button class="chart-filter-btn" id="wlf-7d" onclick="setWorkoutLogFilter('7D')">7 Days</button>
+                <button class="chart-filter-btn" id="wlf-30d" onclick="setWorkoutLogFilter('30D')">30 Days</button>
+              </div>
+              <button class="btn btn-ghost btn-sm" onclick="openModal()">+ Add Exercise</button>
+            </div>
+          </div>
+
+          <div id="workout-log"></div>
+        </div>
+
+        <!-- RIGHT: Session summary -->
+        <aside>
+          <div class="sidebar-section">
+            <h3 class="editorial sidebar-title">Summary</h3>
+            <div class="summary-card">
+              <div class="summary-row">
+                <span>Total Exercises</span>
+                <strong id="sum-exercises">0</strong>
+              </div>
+              <div class="summary-row">
+                <span>Total Sets Completed</span>
+                <strong id="sum-sets">0</strong>
+              </div>
+              <div class="summary-row">
+                <span>Total Volume Lifted</span>
+                <strong id="sum-volume">0 kg</strong>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </div><!-- /tab-training -->
+
+    <!-- TAB: ACTIVITY DETAIL -->
+    <div class="tab-panel" id="tab-activity-detail">
+      <div style="margin-bottom: 24px;">
+        <button class="btn btn-ghost" onclick="switchTab('training')">← Back to Workout</button>
+      </div>
+
+      <!-- ACTIVITY HEADER -->
+      <div class="activity-detail-header" id="ad-header">
+        <!-- Populated dynamically by JS -->
+      </div>
+
+      <!-- METRICS KPI GRID -->
+      <div class="activity-kpi-grid" id="ad-kpi-grid">
+        <!-- Populated dynamically by JS -->
+      </div>
+
+      <!-- DETAIL CONTENT GRID: CHARTS & BREAKDOWN -->
+      <div class="main-grid" style="margin-top: 28px;">
+        <div id="ad-main-content">
+          <!-- Main chart & breakdown populated by JS -->
+        </div>
+        <aside id="ad-sidebar-content">
+          <!-- Sidebar stats populated by JS -->
+        </aside>
+      </div>
+    </div><!-- /tab-activity-detail -->
+
+    <!-- TAB: NUTRITION -->
+    <div class="tab-panel" id="tab-nutrition">
+      <div class="nutrition-grid">
+
+        <!-- LEFT: Trends + Log -->
+        <div>
+          <!-- NUTRITION TREND ANALYTICS CARD -->
+          <div class="trend-chart-card" style="margin-top:0;">
+
+            <div class="trend-chart-head">
+              <div>
+                <h2 class="editorial trend-chart-title">Nutrition Trends</h2>
+              </div>
+              <div class="chart-filters">
+                <button class="chart-filter-btn active" id="tf-1d" onclick="changeChartTimeframe('1D')">1D</button>
+                <button class="chart-filter-btn" id="tf-7d" onclick="changeChartTimeframe('7D')">7D</button>
+                <button class="chart-filter-btn" id="tf-30d" onclick="changeChartTimeframe('30D')">30D</button>
+                <button class="chart-filter-btn" id="tf-1y" onclick="changeChartTimeframe('1Y')">1Y</button>
+              </div>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="nutrition-trend-chart"></canvas>
+            </div>
+          </div>
+
+          <!-- Food log history -->
+          <div style="margin-top:28px;">
+            <div class="food-log-heading" style="display:flex; justify-content:space-between; align-items:center;">
+              <h2 class="editorial food-log-title">Food Log</h2>
+              <div class="food-log-controls">
+                <button class="btn btn-fill btn-sm" onclick="openFoodModal()">+ Log Food</button>
+                <input type="date" id="food-date-filter" class="form-input" style="padding:4px 8px; font-size:13px;" onchange="handleFoodDateChange(this.value)">
+                <span style="font-size:13px;color:var(--ink-muted);" id="food-entry-count">0 entries</span>
+              </div>
+            </div>
+            <div id="food-log-list">
+              <div class="empty-food">No food logged yet.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Daily summary sidebar -->
+        <aside>
+          <div class="sidebar-section">
+            <div class="day-summary">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="editorial day-kcal"><span id="total-kcal-display">0</span> / <span
+                    id="target-akg-kcal">2,350</span> <span>kcal</span></div>
+                <span id="sidebar-rating-badge" class="rating-badge rating-na">Grade N/A</span>
+              </div>
+              <div class="day-sub">Calories Today</div>
+
+              <div class="macro-track"
+                style="margin:16px 0 8px 0;height:8px;border-radius:4px;overflow:hidden;display:flex;background:var(--border);">
+                <div class="m-p" id="total-p-bar" style="width:0%;"></div>
+                <div class="m-c" id="total-c-bar" style="width:0%;"></div>
+                <div class="m-f" id="total-f-bar" style="width:0%;"></div>
+              </div>
+            </div>
+
+            <!-- DEDICATED DAILY CONSUMED MACRO TILES -->
+            <div style="margin-top:20px;">
+              <h3 class="editorial sidebar-title" style="margin-bottom:12px;">Daily Nutrients</h3>
+              <div class="macro-card-grid">
+                <div class="macro-card">
+                  <span class="macro-card-label">Protein</span>
+                  <div class="macro-card-val"><span id="total-protein">0</span>g</div>
+                  <div class="macro-card-target">Target: <span id="target-akg-p">130</span>g</div>
+                </div>
+                <div class="macro-card">
+                  <span class="macro-card-label">Karbohidrat</span>
+                  <div class="macro-card-val"><span id="total-carbs">0</span>g</div>
+                  <div class="macro-card-target">Target: <span id="target-akg-c">275</span>g</div>
+                </div>
+                <div class="macro-card">
+                  <span class="macro-card-label">Lemak</span>
+                  <div class="macro-card-val"><span id="total-fat">0</span>g</div>
+                  <div class="macro-card-target">Target: <span id="target-akg-f">60</span>g</div>
+                </div>
+                <div class="macro-card">
+                  <span class="macro-card-label">Gula (Sugar)</span>
+                  <div class="macro-card-val"><span id="total-sugar">0</span>g</div>
+                  <div class="macro-card-target">Max: 30g</div>
+                </div>
+                <div class="macro-card" style="grid-column: span 2;">
+                  <span class="macro-card-label">Natrium (Na)</span>
+                  <div class="macro-card-val"><span id="total-sodium">0</span>mg</div>
+                  <div class="macro-card-target">Max: 2,000mg</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="macro-detail" style="margin-top:16px;">
+              <div class="macro-detail-row">
+                <span>BB / TB Stats</span>
+                <span class="macro-detail-val"><span id="sidebar-bb">65</span> kg / <span id="sidebar-tb">171</span>
+                  cm</span>
+              </div>
+              <div class="macro-detail-row">
+                <span>BMR (Basal Rate)</span>
+                <span class="macro-detail-val"><span id="sidebar-bmr">1,598</span> kcal</span>
+              </div>
+              <div class="macro-detail-row">
+                <span>AKG Target (TDEE)</span>
+                <span class="macro-detail-val" style="font-weight:600;"><span id="sidebar-tdee">2,350</span> kcal</span>
+              </div>
+            </div>
+
+            <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:12px;" onclick="openBodyStatsModal()"><i
+                class="ph ph-pencil-simple" aria-hidden="true"></i> Nutrition Profile &amp; Integrasi</button>
+          </div>
+        </aside>
+
+      </div>
+    </div><!-- /tab-nutrition -->
+
+  </div><!-- /.page -->
+
+  <!-- MODAL — Log Exercise -->
+  <div class="overlay" id="log-overlay">
+    <div class="modal">
+      <div class="modal-head">
+        <h2 class="editorial modal-title">Log Exercise</h2>
+        <button class="btn btn-ghost btn-sm" onclick="closeModal()" aria-label="Close exercise form"><i class="ph ph-x" aria-hidden="true"></i></button>
+      </div>
+      <form onsubmit="handleLogSubmit(event)">
+        <div class="field">
+          <label for="inp-exercise">Exercise Name</label>
+          <input type="text" id="inp-exercise" placeholder="e.g. Barbell Bench Press" autocomplete="off" required>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="inp-weight">Weight (kg)</label>
+            <input type="number" id="inp-weight" step="0.5" placeholder="70" required>
+          </div>
+          <div class="field">
+            <label for="inp-reps">Reps</label>
+            <input type="number" id="inp-reps" placeholder="10" min="1" required>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn btn-fill">Save Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL — Fast Food Log -->
+  <div class="overlay" id="food-overlay" role="dialog" aria-modal="true" aria-labelledby="food-modal-title">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <h2 class="editorial modal-title" id="food-modal-title">Log Food</h2>
+          <p class="modal-subtitle">Calories are required; macros improve tomorrow's catering plan.</p>
+        </div>
+        <button class="btn btn-ghost btn-sm" type="button" onclick="closeFoodModal()" aria-label="Close food form"><i class="ph ph-x" aria-hidden="true"></i></button>
+      </div>
+      <form onsubmit="saveManualFoodLog(event)">
+        <div class="field-row">
+          <div class="field field-grow-2">
+            <label for="food-name-input">Food or meal name</label>
+            <input id="food-name-input" type="text" maxlength="120" autocomplete="off" placeholder="e.g. Chicken rice bowl" required>
+          </div>
+          <div class="field">
+            <label for="food-category-input">Meal</label>
+            <select id="food-category-input">
+              <option value="breakfast">Breakfast</option>
+              <option value="lunch">Lunch</option>
+              <option value="dinner">Dinner</option>
+              <option value="snack">Snack</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="food-kcal-input">Calories</label>
+          <input id="food-kcal-input" type="number" min="1" max="10000" step="1" inputmode="numeric" placeholder="450" required>
+        </div>
+        <div class="field-row">
+          <div class="field"><label for="food-p-input">Protein (g)</label><input id="food-p-input" type="number" min="0" max="1000" step="0.1" placeholder="30"></div>
+          <div class="field"><label for="food-c-input">Carbs (g)</label><input id="food-c-input" type="number" min="0" max="1000" step="0.1" placeholder="45"></div>
+          <div class="field"><label for="food-f-input">Fat (g)</label><input id="food-f-input" type="number" min="0" max="1000" step="0.1" placeholder="12"></div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-ghost" onclick="closeFoodModal()">Cancel</button>
+          <button type="submit" class="btn btn-fill" id="food-save-btn">Save Food</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL — Body Stats & AKG Calculator -->
+  <div class="overlay" id="bodystats-overlay" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
+    <div class="modal modal-wide">
+      <div class="modal-head">
+        <div><h2 class="editorial modal-title" id="profile-modal-title">Nutrition Profile</h2><p class="modal-subtitle">Only inputs that affect targets and recommendations.</p></div>
+        <button class="btn btn-ghost btn-sm" type="button" onclick="closeBodyStatsModal()" aria-label="Close nutrition profile"><i class="ph ph-x" aria-hidden="true"></i></button>
+      </div>
+      <form onsubmit="handleBodyStatsSubmit(event)">
+        <div class="field-row">
+          <div class="field">
+            <label for="inp-bb">Berat Badan (BB - kg)</label>
+            <input type="number" id="inp-bb" step="0.5" value="65" placeholder="65" oninput="recalcAKGPreview()"
+              required>
+          </div>
+          <div class="field">
+            <label for="inp-tb">Tinggi Badan (TB - cm)</label>
+            <input type="number" id="inp-tb" step="0.5" value="171" placeholder="171" oninput="recalcAKGPreview()"
+              required>
+          </div>
+        </div>
+        <div class="field">
+          <label for="inp-age">Umur (Tahun)</label>
+          <input type="number" id="inp-age" value="25" placeholder="25" oninput="recalcAKGPreview()" required>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="inp-sex">Biological sex</label>
+            <select id="inp-sex" onchange="recalcAKGPreview()"><option value="male">Male</option><option value="female">Female</option></select>
+          </div>
+          <div class="field">
+            <label for="inp-activity">Activity level</label>
+            <select id="inp-activity" onchange="recalcAKGPreview()"><option value="sedentary">Sedentary</option><option value="light">Light</option><option value="moderate">Moderate</option><option value="active">Active</option></select>
+          </div>
+          <div class="field">
+            <label for="inp-goal">Goal</label>
+            <select id="inp-goal" onchange="recalcAKGPreview()"><option value="lose">Lose weight</option><option value="maintain">Maintain</option><option value="gain">Gain weight</option></select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label for="inp-target-weight">Target weight (kg)</label><input id="inp-target-weight" type="number" min="30" max="350" step="0.5"></div>
+          <div class="field"><label for="inp-rate">Weekly rate (kg)</label><input id="inp-rate" type="number" min="0" max="1" step="0.1" value="0.25" oninput="recalcAKGPreview()"></div>
+          <div class="field"><label for="inp-diet">Diet preference</label><select id="inp-diet"><option value="none">No preference</option><option value="vegetarian">Vegetarian</option><option value="vegan">Vegan</option><option value="pescatarian">Pescatarian</option></select></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label for="inp-allergies">Allergies</label><input id="inp-allergies" type="text" maxlength="300" placeholder="e.g. dairy, soy"></div>
+          <div class="field"><label for="inp-dislikes">Disliked foods</label><input id="inp-dislikes" type="text" maxlength="300" placeholder="e.g. tuna, mushrooms"></div>
+        </div>
+
+        <!-- AKG Preview Box -->
+        <div class="akg-preview-box">
+          <div class="akg-row">
+            <span>BMR (Basal Metabolic Rate):</span>
+            <strong id="akg-bmr-val">1,598 kcal</strong>
+          </div>
+          <div class="akg-row">
+            <span>Daily calorie target:</span>
+            <strong id="akg-tdee-val" style="color:var(--ink);">2,350 kcal</strong>
+          </div>
+          <div class="akg-macros">
+            <span>Protein: <strong id="akg-p-val">130g</strong></span>
+            <span>Karbo: <strong id="akg-c-val">275g</strong></span>
+            <span>Lemak: <strong id="akg-f-val">60g</strong></span>
+          </div>
+        </div>
+
+        <section class="integration-box" aria-labelledby="integration-title">
+          <div class="integration-copy">
+            <p class="dash-card-label">Integrasi</p>
+            <h3 id="integration-title">Catat makanan lewat Telegram</h3>
+            <p id="telegram-status" role="status" aria-live="polite">Memeriksa status koneksi…</p>
+            <p class="integration-help">Buat link, buka di aplikasi Telegram, lalu tekan <strong>START</strong>. Foto atau deskripsi makanan akan masuk ke Calora setelah kamu menyetujui hasilnya.</p>
+            <div class="telegram-link-actions" id="telegram-link-actions" hidden>
+              <div class="integration-actions">
+                <a class="btn btn-fill" id="telegram-open-link" href="#" target="_blank" rel="noopener noreferrer">Buka Telegram</a>
+                <button type="button" class="btn btn-ghost" onclick="copyTelegramCommand()">Salin perintah /start</button>
+              </div>
+              <input class="telegram-command" id="telegram-start-command" type="text" readonly aria-label="Perintah koneksi Telegram" onclick="this.select()">
+              <small id="telegram-link-expiry"></small>
+            </div>
+          </div>
+          <button type="button" class="btn btn-ghost" id="telegram-connect-btn" onclick="connectTelegram()">Buat Link Telegram</button>
+        </section>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-ghost" onclick="closeBodyStatsModal()">Cancel</button>
+          <button type="submit" class="btn btn-fill" id="profile-save-btn">Save Profile</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- PRETTY ACTION CONFIRMATION MODAL -->
+  <div class="overlay" id="confirm-overlay">
+    <div class="modal">
+      <div class="modal-head">
+        <h2 class="editorial modal-title" id="confirm-title">Confirm Action</h2>
+        <button class="btn btn-ghost btn-sm" onclick="closeConfirmModal()"><i class="ph ph-x"></i></button>
+      </div>
+      <div class="confirm-body" id="confirm-message">Are you sure you want to proceed?</div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeConfirmModal()">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirm-action-btn">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGIN OVERLAY -->
+  <div class="pin-overlay" id="pin-lock-overlay">
+    <div class="login-box" id="login-box">
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:48px;">
+        <p class="login-brand editorial" style="margin-bottom:0;">Calora AI</p>
+        <button class="btn btn-ghost btn-sm" onclick="closeLoginOverlay()" style="font-size:16px; padding:4px 10px;"
+          title="Close">✕</button>
+      </div>
+
+      <!-- STEP 1: USERNAME -->
+      <div class="login-step" id="login-step-1">
+        <label class="login-label" for="login-username">Username</label>
+        <input class="login-input" id="login-username" type="text" autocomplete="username" autocapitalize="none"
+          spellcheck="false" placeholder="" onkeydown="if(event.key==='Enter') submitUsername()">
+        <button class="login-btn" id="login-continue-btn" onclick="submitUsername()">Continue →</button>
+      </div>
+
+      <!-- STEP 2: PASSWORD (revealed after username submitted) -->
+      <div class="login-step login-step--hidden" id="login-step-2">
+        <button class="login-back" onclick="loginGoBack()">← Back</button>
+        <label class="login-label" for="login-password">Password</label>
+        <input class="login-input" id="login-password" type="password" autocomplete="current-password" placeholder=""
+          onkeydown="if(event.key==='Enter') submitPassword()">
+        <button class="login-btn" id="login-unlock-btn" onclick="submitPassword()">Unlock</button>
+      </div>
+
+      <p class="login-error" id="login-error-msg"></p>
+      <p class="login-lockout" id="login-lockout-msg"></p>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script type="module" src="js/main.js?v=1.4.0"></script>
+</body>
+
+</html>
