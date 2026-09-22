@@ -24,7 +24,7 @@ npm run css:build
 npm run start:dev
 ```
 
-Development Dave/1234, Alex/5678, and Admin/2468 accounts are seeded when `NODE_ENV` is not production.
+Development Dave/1234, Alex/5678, Aifih/1414, and Admin/2468 accounts are seeded when `NODE_ENV` is not production.
 
 ## Telegram bot
 

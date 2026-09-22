@@ -6,6 +6,7 @@ import { PrismaService } from '../prisma/prisma.service';
 const DEFAULT_USERS = process.env.NODE_ENV === 'production' ? [] : [
   { id: 'dave', name: 'Dave', email: 'dave@local.test', password: '1234', role: 'USER', profile: { bb: 68, tb: 175, age: 25, sex: 'male', activity: 'moderate', goal: 'maintain' } },
   { id: 'alex', name: 'Alex', email: 'alex@local.test', password: '5678', role: 'USER', profile: { bb: 55, tb: 165, age: 24, sex: 'female', activity: 'light', goal: 'maintain' } },
+  { id: 'aifih', name: 'Aifih', email: 'aifih@local.test', password: '1414', role: 'USER', profile: { bb: 70, tb: 172, age: 22, sex: 'male', activity: 'moderate', goal: 'maintain' } },
   { id: 'admin-local', name: 'Admin', email: 'admin@local.test', password: '2468', role: 'ADMIN', profile: { bb: 70, tb: 175, age: 30, sex: 'male', activity: 'moderate', goal: 'maintain' } }
 ];
 

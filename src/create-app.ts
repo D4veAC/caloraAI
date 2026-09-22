@@ -8,7 +8,7 @@ import { HttpErrorFilter } from './common/http-exception.filter';
 
 const ROOT = process.cwd();
 const SPA_ROUTES = new Set(['/', '/dashboard', '/training', '/nutrition', '/trends']);
-const ROOT_ASSETS = new Set(['index.html', 'admin.html', 'styles.css', 'app.js', 'athlete.png', 'frame1.png', 'frame2.png', 'frame3.png', 'frame4.png', 'hero.png', 'muscular_constellation.png', 'michelle.glb', 'runner.glb', 'soldier.glb']);
+const ROOT_ASSETS = new Set(['index.html', 'admin.html']);
 
 export async function createApp() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, { logger: ['error', 'warn'] });
