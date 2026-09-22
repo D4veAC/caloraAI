@@ -6,7 +6,7 @@ import { state } from './state.js';
 import { switchTab, _rawSwitchTab } from './ui/router.js';
 import { initModalListeners, openModal, openFoodModal, closeFoodModal, openBodyStatsModal, closeBodyStatsModal, recalcAKGPreview } from './ui/modal.js';
 import { updateNavIndicator, updateNavUserDisplay } from './ui/nav.js';
-import { checkAuth, submitUsername, loginGoBack, submitPassword, lockApp, closeLoginOverlay } from './features/auth.js';
+import { checkAuth, submitUsername, loginGoBack, submitPassword, lockApp, closeLoginOverlay, openLoginOverlay } from './features/auth.js';
 import { renderDashboardOverview, syncAdaptiveDashboard } from './features/dashboard.js';
 import { renderWorkouts, syncTimers, setWorkoutLogFilter, syncWebhookWorkouts } from './features/workout.js';
 import { renderFoodLog, syncRemoteFoodLogs } from './features/nutrition.js';
@@ -97,11 +97,7 @@ if (!window.__FITVAULT_BOOTSTRAPPED__) {
       }
     });
 
-    document.addEventListener('auth:required', () => {
-      const overlay = document.getElementById('pin-lock-overlay');
-      if (overlay) overlay.classList.add('open');
-      document.getElementById('login-username').focus();
-    });
+    document.addEventListener('auth:required', openLoginOverlay);
 
     bootApp();
     loadTelegramStatus();

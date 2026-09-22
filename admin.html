@@ -4,18 +4,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Calora — Catering Operations</title>
-  <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=DM+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="css/app.css?v=2.0.0">
 </head>
-<body class="admin-body">
-  <main class="admin-shell">
-    <header class="admin-head">
-      <div><p class="dash-card-label">Calora operations</p><h1 class="editorial">Tomorrow's Kitchen</h1></div>
+<body class="admin-body bg-bg text-ink font-sans">
+  <main class="admin-shell mx-auto max-w-6xl p-6">
+    <header class="admin-head mb-8 flex items-center justify-between">
+      <div><p class="dash-card-label">Calora operations</p><h1 class="editorial text-3xl">Tomorrow's Kitchen</h1></div>
       <a class="btn btn-ghost" href="/">User app</a>
     </header>
 
-    <form id="admin-login" class="admin-login">
-      <h2>Admin sign in</h2>
+    <form id="admin-login" class="admin-login max-w-md space-y-3">
+      <h2 class="editorial text-2xl">Admin sign in</h2>
       <label for="admin-name">Username</label><input id="admin-name" autocomplete="username" required>
       <label for="admin-password">Password</label><input id="admin-password" type="password" autocomplete="current-password" required>
       <button class="btn btn-fill" type="submit">Sign in</button>
@@ -23,14 +23,14 @@
     </form>
 
     <section id="admin-content" hidden>
-      <div class="admin-metrics" id="admin-metrics"></div>
-      <div class="admin-table-wrap">
-        <table>
-          <thead><tr><th>User</th><th>Target</th><th>Catering</th><th>Lunch</th><th>Dinner</th><th>Adjustment</th><th>Status</th></tr></thead>
+      <div class="admin-metrics mb-6 grid gap-4 md:grid-cols-4" id="admin-metrics"></div>
+      <div class="admin-table-wrap overflow-x-auto">
+        <table class="w-full text-left">
+          <thead><tr><th>User</th><th>Target</th><th>Lunch kcal</th><th>Lunch menu</th><th>Adjustment</th><th>Status</th></tr></thead>
           <tbody id="admin-plan-rows"></tbody>
         </table>
       </div>
-      <p class="admin-note">This operational view intentionally excludes raw third-party activity data.</p>
+      <p class="admin-note mt-4 text-sm text-ink-muted">Kitchen view lists tomorrow lunch orders only.</p>
     </section>
   </main>
   <script type="module" src="js/admin.js"></script>

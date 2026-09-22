@@ -1,5 +1,5 @@
 import { state } from '../state.js';
-import { _rawSwitchTab } from '../ui/router.js';
+import { _rawSwitchTab, tabFromPath } from '../ui/router.js';
 import { showToast } from '../ui/toast.js';
 import { updateNavUserDisplay } from '../ui/nav.js';
 import { renderDashboardOverview, syncAdaptiveDashboard } from './dashboard.js';
@@ -21,16 +21,15 @@ export async function checkAuth() {
       const { user } = await response.json();
       applyAuthenticatedUser(user);
       await syncAdaptiveDashboard();
-      _rawSwitchTab('dashboard');
+      const next = tabFromPath();
+      _rawSwitchTab(next === 'welcome' ? 'dashboard' : next, true);
       return true;
     }
   } catch {}
   state.setCurrentUser(null, null, null);
-  _rawSwitchTab('welcome');
+  _rawSwitchTab('welcome', true);
   return false;
 }
-
-document.addEventListener('auth:required', openLoginOverlay);
 
 export function closeLoginOverlay() {
   document.getElementById('pin-lock-overlay')?.classList.remove('open', 'unlocking');

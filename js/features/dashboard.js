@@ -152,8 +152,14 @@ export function renderDashboardOverview() {
     setText('catering-allocation', `${Number(plan.cateringAllocation).toLocaleString('id-ID')} kcal`);
     setText('catering-lunch', plan.lunch?.name || 'Menu unavailable');
     setText('catering-lunch-macros', plan.lunch ? `${plan.lunch.calories} kcal · ${plan.lunch.proteinG}g protein` : 'Check dietary constraints');
-    setText('catering-dinner', plan.dinner?.name || 'Menu unavailable');
-    setText('catering-dinner-macros', plan.dinner ? `${plan.dinner.calories} kcal · ${plan.dinner.proteinG}g protein` : 'Check dietary constraints');
+    const tonight = state.dashboard?.tonight;
+    setText('catering-tonight', tonight?.meal?.name || 'Log food to get a tonight recommendation');
+    setText('catering-tonight-macros', tonight?.meal
+      ? `${tonight.meal.kcal} kcal · ${tonight.meal.protein}g protein · remaining ${tonight.constraints?.kcal?.max ?? 0} kcal`
+      : tonight?.constraints ? `Remaining ${tonight.constraints.kcal?.max || 0} kcal tonight` : '');
+    const goal = state.dashboard?.goalSummary;
+    setText('dash-goal-label', goal?.label || 'Set a weight target');
+    setText('dash-goal-target', goal ? `${goal.currentKg} kg → ${goal.targetKg} kg` : '');
     setText('catering-confidence', `${plan.confidence.toLowerCase()} confidence · ${plan.status.toLowerCase()}`);
     setText('catering-adjustment', plan.adaptations?.length ? plan.adaptations.join(' · ').replaceAll('_', ' ') : 'Calories unchanged');
     const explanations = document.getElementById('catering-explanations');

@@ -72,7 +72,7 @@ export function renderFoodLog() {
           <span>${esc(entry.category || 'meal')}</span>
           <span>P ${entry.protein || 0}g</span><span>C ${entry.carbs || 0}g</span><span>F ${entry.fat || 0}g</span>
         </div>
-        ${entry.source === 'ai-photo' ? `<small class="estimate-note">AI estimate${entry.confidence != null ? ` · ${Math.round(entry.confidence * 100)}% confidence` : ''}; reviewed before saving.</small>` : ''}
+        ${['AI_ESTIMATE', 'PHOTO_ESTIMATE', 'TEXT_ESTIMATE', 'ai-photo'].includes(String(entry.source || '').toUpperCase().replace('-', '_')) || String(entry.source || '').toLowerCase() === 'ai-photo' ? `<small class="estimate-note">AI estimate${entry.confidence != null ? ` · ${Math.round(entry.confidence * 100)}% confidence` : ''}; reviewed before saving.</small>` : ''}
       </div>
       <div class="food-log-actions">
         <strong>${entry.kcal} kcal</strong>
@@ -111,7 +111,7 @@ export async function saveManualFoodLog(event) {
     protein: Number(document.getElementById('food-p-input')?.value || 0),
     carbs: Number(document.getElementById('food-c-input')?.value || 0),
     fat: Number(document.getElementById('food-f-input')?.value || 0),
-    source: 'manual',
+    source: document.getElementById('food-source-input')?.value || 'MANUAL',
     createdAt: new Date().toISOString()
   };
   if (!entry.meal || !Number.isFinite(entry.kcal) || entry.kcal <= 0 || [entry.protein, entry.carbs, entry.fat].some(value => value < 0)) {
@@ -165,6 +165,39 @@ export function handleFoodDateChange(value) {
   renderFoodLog();
 }
 
+export async function analyzeFoodPhoto(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  const button = document.getElementById('food-analyze-btn');
+  if (button) {
+    button.disabled = true;
+    button.textContent = 'Analyzing…';
+  }
+  try {
+    const body = new FormData();
+    body.append('image', file);
+    const response = await fetch('/api/analyze', { method: 'POST', body });
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error || 'Photo could not be analyzed');
+    document.getElementById('food-name-input').value = payload.mealName || '';
+    document.getElementById('food-kcal-input').value = payload.kcal || '';
+    document.getElementById('food-p-input').value = payload.protein || '';
+    document.getElementById('food-c-input').value = payload.carbs || '';
+    document.getElementById('food-f-input').value = payload.fat || '';
+    document.getElementById('food-source-input').value = payload.source || 'PHOTO_ESTIMATE';
+    showToast('Review the estimate before saving', 'info');
+  } catch (error) {
+    showToast(error.message, 'danger');
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.textContent = 'Analyze photo';
+    }
+    event.target.value = '';
+  }
+}
+
 window.deleteFoodLogEntry = deleteFoodLogEntry;
 window.saveManualFoodLog = saveManualFoodLog;
 window.handleFoodDateChange = handleFoodDateChange;
+window.analyzeFoodPhoto = analyzeFoodPhoto;

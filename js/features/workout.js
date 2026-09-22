@@ -66,7 +66,7 @@ export async function endSession() {
 
 export async function syncWebhookWorkouts() {
   try {
-    const res = await fetch('/api/workout');
+    const res = await fetch('/api/activity');
     if (!res.ok) return;
     const remoteWorkouts = await res.json();
     if (!Array.isArray(remoteWorkouts) || remoteWorkouts.length === 0) return;

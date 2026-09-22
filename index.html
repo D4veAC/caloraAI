@@ -24,16 +24,17 @@
   <!-- Chart.js for Trend Analytics -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <link rel="stylesheet" href="css/main.css?v=1.4.0">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+  <link rel="stylesheet" href="css/app.css?v=2.0.0">
 </head>
 
 <body>
 
   <!-- NAV -->
-  <nav>
+  <nav class="border-b border-border bg-bg">
     <div class="nav-inner">
-      <div style="display:flex;align-items:center;gap:24px;">
-        <span class="nav-brand editorial" style="cursor:pointer;" onclick="switchTab('welcome')">Calora AI</span>
+      <div class="flex items-center gap-6">
+        <span class="nav-brand editorial cursor-pointer" onclick="switchTab('welcome')">Calora AI</span>
         <div class="nav-tabs" id="nav-tabs-container">
           <div class="nav-tab-indicator" id="nav-tab-indicator"></div>
           <button class="nav-tab-btn" id="tab-dashboard-btn" onclick="switchTab('dashboard')">Dashboard</button>
@@ -81,6 +82,8 @@
         <div>
           <p class="dash-eyebrow" id="dash-date-str"></p>
           <h1 class="editorial dash-greeting-h1" id="dash-greeting">Calora user</h1>
+          <p class="text-sm text-ink-muted" id="dash-goal-label">Set a weight target</p>
+          <p class="text-xs text-ink-faint" id="dash-goal-target"></p>
         </div>
         <div class="dash-actions">
           <button class="btn btn-ghost btn-sm" onclick="openFoodModal()">Log Food</button>
@@ -217,8 +220,8 @@
         <div class="dash-catering-grid">
           <div><span>Daily target</span><strong id="catering-daily-target">—</strong></div>
           <div><span>Catering allocation</span><strong id="catering-allocation">—</strong></div>
-          <div><span>Lunch</span><strong id="catering-lunch">—</strong><small id="catering-lunch-macros"></small></div>
-          <div><span>Dinner</span><strong id="catering-dinner">—</strong><small id="catering-dinner-macros"></small></div>
+          <div><span>Tomorrow lunch</span><strong id="catering-lunch">—</strong><small id="catering-lunch-macros"></small></div>
+          <div><span>Tonight eat</span><strong id="catering-tonight">—</strong><small id="catering-tonight-macros"></small></div>
         </div>
         <div class="dash-catering-adjustment" id="catering-adjustment">No adjustment yet.</div>
       </section>
@@ -346,33 +349,6 @@
 
       </div>
     </div><!-- /tab-training -->
-
-    <!-- TAB: ACTIVITY DETAIL -->
-    <div class="tab-panel" id="tab-activity-detail">
-      <div style="margin-bottom: 24px;">
-        <button class="btn btn-ghost" onclick="switchTab('training')">← Back to Workout</button>
-      </div>
-
-      <!-- ACTIVITY HEADER -->
-      <div class="activity-detail-header" id="ad-header">
-        <!-- Populated dynamically by JS -->
-      </div>
-
-      <!-- METRICS KPI GRID -->
-      <div class="activity-kpi-grid" id="ad-kpi-grid">
-        <!-- Populated dynamically by JS -->
-      </div>
-
-      <!-- DETAIL CONTENT GRID: CHARTS & BREAKDOWN -->
-      <div class="main-grid" style="margin-top: 28px;">
-        <div id="ad-main-content">
-          <!-- Main chart & breakdown populated by JS -->
-        </div>
-        <aside id="ad-sidebar-content">
-          <!-- Sidebar stats populated by JS -->
-        </aside>
-      </div>
-    </div><!-- /tab-activity-detail -->
 
     <!-- TAB: NUTRITION -->
     <div class="tab-panel" id="tab-nutrition">
@@ -528,11 +504,17 @@
       <div class="modal-head">
         <div>
           <h2 class="editorial modal-title" id="food-modal-title">Log Food</h2>
-          <p class="modal-subtitle">Calories are required; macros improve tomorrow's catering plan.</p>
+          <p class="modal-subtitle">Photograph a meal or enter values. Review AI estimates before saving.</p>
         </div>
         <button class="btn btn-ghost btn-sm" type="button" onclick="closeFoodModal()" aria-label="Close food form"><i class="ph ph-x" aria-hidden="true"></i></button>
       </div>
       <form onsubmit="saveManualFoodLog(event)">
+        <div class="field">
+          <label for="food-photo-input">Food photo</label>
+          <input id="food-photo-input" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" onchange="analyzeFoodPhoto(event)">
+          <button type="button" class="btn btn-ghost btn-sm" id="food-analyze-btn" onclick="document.getElementById('food-photo-input').click()">Analyze photo</button>
+          <input type="hidden" id="food-source-input" value="MANUAL">
+        </div>
         <div class="field-row">
           <div class="field field-grow-2">
             <label for="food-name-input">Food or meal name</label>

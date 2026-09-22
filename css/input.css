@@ -1,0 +1,29 @@
+@import "tailwindcss";
+@import "./variables.css";
+@import "./layout.css";
+@import "./components.css";
+@import "./dashboard.css";
+@import "./training.css";
+@import "./nutrition.css";
+@import "./auth.css";
+@import "./admin.css";
+
+@source "../index.html";
+@source "../admin.html";
+@source "../js/**/*.js";
+
+@theme {
+  --color-bg: #111009;
+  --color-surface: #1c1a17;
+  --color-border: #2e2b26;
+  --color-ink: #f7f1e8;
+  --color-ink-muted: #9c9488;
+  --color-ink-faint: #4a4741;
+  --color-accent: #d4c9b4;
+  --font-sans: "DM Sans", system-ui, sans-serif;
+  --font-serif: "Cormorant Garamond", serif;
+}
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+.editorial { font-family: var(--font-serif); font-weight: 300; }
