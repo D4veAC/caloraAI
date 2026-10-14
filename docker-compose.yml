@@ -29,7 +29,7 @@ services:
 
   bot:
     build: ./telegram-bot
-    env_file: .env
+    env_file: ./telegram-bot/.env
     environment:
       CALORA_API_URL: http://api:3005
     depends_on:
