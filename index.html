@@ -10,60 +10,65 @@
   <title>Calora AI — Adaptive Nutrition</title>
   <meta name="description" content="Personal workout and nutrition tracker.">
 
-  <!-- DM Sans + Cormorant Garamond -->
+  <!-- DM Sans + Luckiest Guy -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Luckiest+Guy&display=swap"
     rel="stylesheet">
 
-  <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
-
-  <!-- Chart.js for Trend Analytics -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
-  <link rel="stylesheet" href="css/app.css?v=2.0.0">
+  <link rel="stylesheet" href="css/app.css?v=2.1.6">
 </head>
 
 <body>
 
   <!-- NAV -->
-  <nav class="border-b border-border bg-bg">
+  <nav class="app-nav">
     <div class="nav-inner">
-      <div class="flex items-center gap-6">
-        <span class="nav-brand editorial cursor-pointer" onclick="switchTab('welcome')">Calora AI</span>
+      <div class="nav-left">
+        <span class="nav-brand editorial cursor-pointer" onclick="goHome()">Calora</span>
         <div class="nav-tabs" id="nav-tabs-container">
           <div class="nav-tab-indicator" id="nav-tab-indicator"></div>
-          <button class="nav-tab-btn" id="tab-dashboard-btn" onclick="switchTab('dashboard')">Dashboard</button>
-          <button class="nav-tab-btn" id="tab-training-btn" onclick="switchTab('training')">Workout</button>
-          <button class="nav-tab-btn" id="tab-nutrition-btn" onclick="switchTab('nutrition')">Food</button>
-          <button class="nav-tab-btn" id="tab-trends-btn" onclick="switchTab('trends')">Trends</button>
+          <button class="nav-tab-btn" data-tab="dashboard" id="tab-dashboard-btn" onclick="switchTab('dashboard')">Home</button>
+          <button class="nav-tab-btn" data-tab="nutrition" id="tab-nutrition-btn" onclick="switchTab('nutrition')">Food</button>
+          <button class="nav-tab-btn" data-tab="training" id="tab-training-btn" onclick="switchTab('training')">Workout</button>
+          <button class="nav-tab-btn" data-tab="trends" id="tab-trends-btn" onclick="switchTab('trends')">Trends</button>
+          <button class="nav-tab-btn" data-tab="profile" id="tab-profile-btn" onclick="switchTab('profile')">Profile</button>
         </div>
       </div>
       <div class="nav-right">
+        <button class="btn btn-fill nav-signin" id="nav-signin" type="button" onclick="openLoginOverlay()">Sign in</button>
         <div class="nav-user-badge">
           <span class="user-name" id="nav-user-name">Guest</span>
-          <button class="btn btn-ghost btn-sm" id="nav-profile-button" type="button" onclick="openBodyStatsModal()">Profile</button>
-          <button class="btn btn-ghost btn-sm" id="nav-session-button" onclick="lockApp()"
-            style="margin-left:8px; padding:4px 10px;">Lock</button>
         </div>
       </div>
     </div>
   </nav>
 
+  <nav class="bottom-nav" aria-label="Primary">
+    <button class="nav-tab-btn" data-tab="dashboard" type="button" onclick="switchTab('dashboard')"><i class="ph ph-house" aria-hidden="true"></i><span>Home</span></button>
+    <button class="nav-tab-btn" data-tab="nutrition" type="button" onclick="switchTab('nutrition')"><i class="ph ph-fork-knife" aria-hidden="true"></i><span>Food</span></button>
+    <button class="nav-tab-btn" data-tab="training" type="button" onclick="switchTab('training')"><i class="ph ph-barbell" aria-hidden="true"></i><span>Workout</span></button>
+    <button class="nav-tab-btn" data-tab="trends" type="button" onclick="switchTab('trends')"><i class="ph ph-chart-line" aria-hidden="true"></i><span>Trends</span></button>
+    <button class="nav-tab-btn" data-tab="profile" type="button" onclick="switchTab('profile')"><i class="ph ph-user" aria-hidden="true"></i><span>Profile</span></button>
+  </nav>
+
+  <button class="fab" type="button" aria-label="Log a meal" onclick="openFoodModal()">+</button>
+
   <div class="page">
 
     <!-- TAB: WELCOME LANDING PAGE -->
-    <div class="tab-panel active" id="tab-welcome">
+    <div class="tab-panel" id="tab-welcome">
       <section class="hero">
         <canvas id="dash-bg-canvas" aria-hidden="true"></canvas>
         <div class="hero-copy">
           <h1 class="editorial hero-title">Know what<br>comes next.</h1>
           <p class="hero-sub">Track what you eat. Understand the trend. Plan tomorrow's catering.</p>
           <div style="margin-top: 36px;">
-            <button class="btn btn-fill btn-lg" onclick="openDashboardWithAuth()"
-              style="padding: 16px 36px; font-size: 16px; letter-spacing:0.02em;">Enter Dashboard →</button>
+            <button class="btn btn-fill btn-lg" type="button" onclick="openLoginOverlay()">Sign in</button>
           </div>
         </div>
 
@@ -73,7 +78,47 @@
     </div>
 
     <!-- TAB: DASHBOARD -->
-    <div class="tab-panel" id="tab-dashboard">
+    <div class="tab-panel active" id="tab-dashboard">
+      <section class="guest-home" data-guest-only>
+        <div class="guest-home-grid">
+          <div class="guest-intro">
+            <p class="dash-card-label">Home</p>
+            <h1 class="editorial">Calora</h1>
+            <p>Calora plans one kitchen lunch. You log the rest of the day, and it tells you what to eat tonight and tomorrow's calorie target.</p>
+            <ul>
+              <li>Log a meal or a workout.</li>
+              <li>Read tonight and tomorrow's catering.</li>
+              <li>Follow weight and calories on Trends, and log from Telegram.</li>
+            </ul>
+            <button class="btn btn-fill" type="button" onclick="openLoginOverlay()">Sign in</button>
+          </div>
+          <div class="food-orbit" aria-hidden="true">
+            <div class="food-orbit-spin">
+              <div class="food-orbit-item" style="--i:0"><div class="food-orbit-face"><svg viewBox="0 0 64 64"><ellipse cx="32" cy="38" rx="20" ry="14" fill="#fff6ea" stroke="#1a1408" stroke-width="3"/><circle cx="32" cy="38" r="6" fill="#f2c14a" stroke="#1a1408" stroke-width="3"/></svg></div></div>
+              <div class="food-orbit-item" style="--i:1"><div class="food-orbit-face"><svg viewBox="0 0 64 64"><path d="M16 24h32l-4 24H20z" fill="#e7c48a" stroke="#1a1408" stroke-width="3"/><path d="M18 30h28" stroke="#1a1408" stroke-width="3"/></svg></div></div>
+              <div class="food-orbit-item" style="--i:2"><div class="food-orbit-face"><svg viewBox="0 0 64 64"><circle cx="32" cy="34" r="16" fill="#e24b32" stroke="#1a1408" stroke-width="3"/><circle cx="26" cy="32" r="2" fill="#7eb85f"/><circle cx="36" cy="30" r="2" fill="#7eb85f"/><circle cx="34" cy="40" r="2" fill="#7eb85f"/></svg></div></div>
+              <div class="food-orbit-item" style="--i:3"><div class="food-orbit-face"><svg viewBox="0 0 64 64"><circle cx="24" cy="28" r="10" fill="#7eb85f" stroke="#1a1408" stroke-width="3"/><circle cx="38" cy="26" r="10" fill="#7eb85f" stroke="#1a1408" stroke-width="3"/><circle cx="32" cy="36" r="10" fill="#7eb85f" stroke="#1a1408" stroke-width="3"/><path d="M32 40v14" stroke="#1a1408" stroke-width="3"/></svg></div></div>
+              <div class="food-orbit-item" style="--i:4"><div class="food-orbit-face"><svg viewBox="0 0 64 64"><path d="M32 16c8 10 10 16 10 24a10 10 0 0 1-20 0c0-8 2-14 10-24z" fill="#e07a2f" stroke="#1a1408" stroke-width="3"/><path d="M32 16v-6M28 12h8" stroke="#7eb85f" stroke-width="3"/></svg></div></div>
+              <div class="food-orbit-item" style="--i:5"><div class="food-orbit-face"><svg viewBox="0 0 64 64"><rect x="26" y="12" width="12" height="8" rx="2" fill="#9fd4e8" stroke="#1a1408" stroke-width="3"/><rect x="22" y="20" width="20" height="32" rx="6" fill="#f7f7f7" stroke="#1a1408" stroke-width="3"/></svg></div></div>
+              <div class="food-orbit-item" style="--i:6"><div class="food-orbit-face"><svg viewBox="0 0 64 64"><circle cx="32" cy="36" r="16" fill="#e24b32" stroke="#1a1408" stroke-width="3"/><path d="M32 20c2-8 8-10 10-8-4 2-6 6-6 10" fill="#7eb85f" stroke="#1a1408" stroke-width="3"/></svg></div></div>
+              <div class="food-orbit-item" style="--i:7"><div class="food-orbit-face"><svg viewBox="0 0 64 64"><circle cx="32" cy="36" r="16" fill="#f0a56a" stroke="#1a1408" stroke-width="3"/><path d="M40 18c4 2 6 6 4 8" fill="none" stroke="#7eb85f" stroke-width="3"/></svg></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="guest-sample">
+          <span class="sample-pill">Sample</span>
+          <h2 class="editorial">Tomorrow's catering</h2>
+          <p>This is a sample day. After you sign in, tonight and tomorrow's catering come from your own meals.</p>
+          <div class="guest-sample-grid">
+            <div><span>Daily target</span><strong>1,800 kcal</strong></div>
+            <div><span>Catering allocation</span><strong>650 kcal</strong></div>
+            <div><span>Tomorrow lunch</span><strong>Sample: chicken rice</strong></div>
+            <div><span>Tonight eat</span><strong>Sample: vegetable soup</strong></div>
+          </div>
+          <button class="btn btn-fill" type="button" onclick="openFoodModal()">Log a meal</button>
+        </div>
+      </section>
+      <div data-authed-only>
 
       <!-- MASTHEAD ROW -->
       <div class="dash-masthead">
@@ -84,15 +129,28 @@
           <p class="text-xs text-ink-faint" id="dash-goal-target"></p>
         </div>
         <div class="dash-actions">
-          <button class="btn btn-ghost btn-sm" onclick="openFoodModal()">Log Food</button>
-          <button class="btn btn-fill btn-sm" onclick="switchTab('training')">Start Workout</button>
+          <button class="btn btn-fill log-meal-header" type="button" onclick="openFoodModal()">Log a meal</button>
         </div>
       </div>
 
-      <!-- ROW 1: TWO HERO CARDS (Food + Training) -->
-      <div class="dash-hero-row">
+      <section class="dash-catering" aria-labelledby="tomorrow-catering-title">
+        <div class="dash-catering-head">
+          <div>
+            <p class="dash-card-label">What to do next</p>
+            <h2 class="editorial" id="tomorrow-catering-title">Tomorrow's catering</h2>
+          </div>
+          <span class="rating-badge" id="catering-confidence">Low confidence</span>
+        </div>
+        <div class="dash-catering-grid">
+          <div><span>Daily target</span><strong id="catering-daily-target">—</strong></div>
+          <div><span>Catering allocation</span><strong id="catering-allocation">—</strong></div>
+          <div><span>Tomorrow lunch</span><strong id="catering-lunch">—</strong><small id="catering-lunch-macros"></small></div>
+          <div><span>Tonight eat</span><strong id="catering-tonight">—</strong><small id="catering-tonight-macros"></small></div>
+        </div>
+        <div class="dash-catering-adjustment" id="catering-adjustment">No adjustment yet.</div>
+      </section>
 
-        <!-- CALORIE HERO -->
+      <div class="today-strip">
         <div class="dash-kcal-card">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
             <p class="dash-card-label" style="margin-bottom:0;">Energy Today</p>
@@ -110,8 +168,45 @@
           </div>
           <p class="dash-kcal-target-label" id="dash-kcal-target">of 2,100 kcal target</p>
         </div>
+      </div>
 
-        <!-- TRAINING HERO -->
+      <div class="dash-wk-tiles today-strip">
+        <div class="dash-tile" onclick="switchTab('nutrition')">
+          <p class="dash-tile-label">Meals Today</p>
+          <p class="editorial dash-tile-val" id="dash-tile-meals">0</p>
+          <p class="dash-tile-sub" id="dash-tile-meals-sub">entries logged</p>
+        </div>
+        <div class="dash-tile">
+          <p class="dash-tile-label">Remaining</p>
+          <p class="editorial dash-tile-val" id="dash-tile-remaining">2,100</p>
+          <p class="dash-tile-sub">kcal left today</p>
+        </div>
+      </div>
+
+      <div class="dash-bottom-row">
+        <div class="dash-section">
+          <div class="dash-section-head">
+            <h2 class="editorial" style="font-size:20px;">Today's Meals</h2>
+            <button class="dash-section-link" type="button" onclick="switchTab('nutrition')">Full log</button>
+          </div>
+          <div id="dash-food-preview"></div>
+        </div>
+        <div class="dash-section">
+          <div class="dash-section-head">
+            <h2 class="editorial" style="font-size:20px;">Recent Workouts</h2>
+            <button class="dash-section-link" type="button" onclick="switchTab('training')">All sessions</button>
+          </div>
+          <div id="dash-workout-preview"></div>
+        </div>
+      </div>
+
+      <details class="dash-why">
+        <summary>Why this changed</summary>
+        <div id="catering-explanations"><p class="dash-insight">More logging is needed before Calora changes tomorrow's catering.</p></div>
+      </details>
+
+      <details class="dash-more">
+        <summary>More about today</summary>
         <div class="dash-train-card" onclick="switchTab('training')">
           <p class="dash-card-label">Training This Week</p>
           <div class="dash-kcal-numbers">
@@ -136,9 +231,7 @@
           </div>
           <p class="dash-kcal-target-label" id="dash-last-session-label">No sessions this week</p>
         </div>
-      </div>
 
-      <!-- ROW 2: MACRO BARS + WORKOUT TILES -->
       <div class="dash-row-2">
 
         <!-- MACRO BARS -->
@@ -193,64 +286,32 @@
             <p class="editorial dash-tile-val" id="dash-tile-sets">0</p>
             <p class="dash-tile-sub">this week</p>
           </div>
-          <div class="dash-tile" onclick="switchTab('nutrition')">
-            <p class="dash-tile-label">Meals Today</p>
-            <p class="editorial dash-tile-val" id="dash-tile-meals">0</p>
-            <p class="dash-tile-sub" id="dash-tile-meals-sub">entries logged</p>
-          </div>
-          <div class="dash-tile">
-            <p class="dash-tile-label">Remaining</p>
-            <p class="editorial dash-tile-val" id="dash-tile-remaining">2,100</p>
-            <p class="dash-tile-sub">kcal left today</p>
-          </div>
         </div>
       </div>
+      </details>
 
-      <!-- TOMORROW'S CATERING -->
-      <section class="dash-catering" aria-labelledby="tomorrow-catering-title">
-        <div class="dash-catering-head">
-          <div>
-            <p class="dash-card-label">Primary adaptive output</p>
-            <h2 class="editorial" id="tomorrow-catering-title">Tomorrow's Catering</h2>
-          </div>
-          <span class="rating-badge" id="catering-confidence">Low confidence</span>
-        </div>
-        <div class="dash-catering-grid">
-          <div><span>Daily target</span><strong id="catering-daily-target">—</strong></div>
-          <div><span>Catering allocation</span><strong id="catering-allocation">—</strong></div>
-          <div><span>Tomorrow lunch</span><strong id="catering-lunch">—</strong><small id="catering-lunch-macros"></small></div>
-          <div><span>Tonight eat</span><strong id="catering-tonight">—</strong><small id="catering-tonight-macros"></small></div>
-        </div>
-        <div class="dash-catering-adjustment" id="catering-adjustment">No adjustment yet.</div>
-      </section>
-
-      <section class="dash-adaptive-card dash-why-card">
-        <p class="dash-card-label">Why this changed</p>
-        <div id="catering-explanations"><p class="dash-insight">More logging is needed before Calora changes tomorrow's catering.</p></div>
-      </section>
-
-      <!-- ROW 3: TODAY'S MEALS + RECENT WORKOUTS -->
-      <div class="dash-bottom-row">
-        <div class="dash-section">
-          <div class="dash-section-head">
-            <h2 class="editorial" style="font-size:20px;">Today's Meals</h2>
-            <button class="dash-section-link" onclick="switchTab('nutrition')">Full Log →</button>
-          </div>
-          <div id="dash-food-preview"></div>
-        </div>
-        <div class="dash-section">
-          <div class="dash-section-head">
-            <h2 class="editorial" style="font-size:20px;">Recent Workouts</h2>
-            <button class="dash-section-link" onclick="switchTab('training')">All Sessions →</button>
-          </div>
-          <div id="dash-workout-preview"></div>
-        </div>
       </div>
-
     </div>
 
     <!-- TAB: TRENDS -->
     <div class="tab-panel" id="tab-trends">
+      <section data-guest-only>
+        <div class="guest-banner">
+          <p class="dash-card-label">Trends</p>
+          <p>Weight, calories, and workouts over time. The numbers below are examples.</p>
+        </div>
+        <div class="guest-sample">
+          <span class="sample-pill">Sample</span>
+          <div class="guest-sample-grid">
+            <div><span>Average calories</span><strong>1,800 kcal</strong></div>
+            <div><span>Average protein</span><strong>90 g</strong></div>
+            <div><span>Logging completeness</span><strong>5 of 7 days</strong></div>
+            <div><span>Weight trajectory</span><strong>-0.2 kg/week</strong></div>
+          </div>
+          <button class="btn btn-fill" type="button" onclick="saveWeightLog(event)">Save weight</button>
+        </div>
+      </section>
+      <div data-authed-only>
       <div class="page-heading-row">
         <div><p class="eyebrow">Rolling state</p><h1 class="editorial">7-day Trends</h1></div>
       </div>
@@ -267,10 +328,27 @@
         <div class="field"><label for="trend-weight-input">Weight (kg)</label><input id="trend-weight-input" type="number" min="30" max="350" step="0.1" required></div>
         <button class="btn btn-fill" type="submit">Save weight</button>
       </form>
+      </div>
     </div>
 
     <!-- TAB: TRAINING -->
     <div class="tab-panel" id="tab-training">
+      <section data-guest-only>
+        <div class="guest-banner">
+          <p class="dash-card-label">Workout</p>
+          <p>Start a session and add exercises here. The sessions below are examples.</p>
+        </div>
+        <div class="guest-sample">
+          <span class="sample-pill">Sample</span>
+          <h2 class="editorial">Sample: squat session</h2>
+          <p>3 sessions this week · 12 sets · 40 minutes</p>
+          <div class="form-actions">
+            <button class="btn btn-fill" type="button" onclick="toggleTimer()">Start session</button>
+            <button class="btn btn-ghost" type="button" onclick="openModal()">Add exercise</button>
+          </div>
+        </div>
+      </section>
+      <div data-authed-only>
 
       <!-- WORKOUT FREQUENCY & INTENSITY ANALYTICS CARD -->
       <div class="trend-chart-card" style="margin-bottom: 28px;">
@@ -299,8 +377,8 @@
               <div class="editorial timer-val" id="timer-display">00:00:00</div>
             </div>
             <div class="timer-actions">
-              <button class="btn btn-ghost" id="btn-timer-toggle" onclick="toggleTimer()">Start</button>
-              <button class="btn btn-fill" onclick="promptEndSession()">End Session</button>
+              <button class="btn btn-fill" id="btn-timer-toggle" type="button" onclick="toggleTimer()">Start session</button>
+              <button class="btn btn-ghost" id="btn-end-session" type="button" onclick="promptEndSession()" hidden>End session</button>
             </div>
           </div>
 
@@ -317,7 +395,7 @@
                 <button class="chart-filter-btn" id="wlf-7d" onclick="setWorkoutLogFilter('7D')">7 Days</button>
                 <button class="chart-filter-btn" id="wlf-30d" onclick="setWorkoutLogFilter('30D')">30 Days</button>
               </div>
-              <button class="btn btn-ghost btn-sm" onclick="openModal()">+ Add Exercise</button>
+              <button class="btn btn-ghost btn-sm" type="button" onclick="openModal()">Add exercise</button>
             </div>
           </div>
 
@@ -346,10 +424,29 @@
         </aside>
 
       </div>
+      </div>
     </div><!-- /tab-training -->
 
     <!-- TAB: NUTRITION -->
     <div class="tab-panel" id="tab-nutrition">
+      <section data-guest-only>
+        <div class="guest-banner">
+          <p class="dash-card-label">Food</p>
+          <p>Log what you eat here. The meals below are examples.</p>
+        </div>
+        <div class="guest-sample">
+          <span class="sample-pill">Sample</span>
+          <h2 class="editorial">Sample: chicken rice</h2>
+          <p>Lunch · 650 kcal · 35g protein</p>
+        </div>
+        <div class="guest-sample">
+          <span class="sample-pill">Sample</span>
+          <h2 class="editorial">Sample: vegetable soup</h2>
+          <p>Dinner · 320 kcal · 12g protein</p>
+        </div>
+        <button class="btn btn-fill" type="button" onclick="openFoodModal()">Log a meal</button>
+      </section>
+      <div data-authed-only>
       <div class="nutrition-grid">
 
         <!-- LEFT: Trends + Log -->
@@ -378,13 +475,13 @@
             <div class="food-log-heading" style="display:flex; justify-content:space-between; align-items:center;">
               <h2 class="editorial food-log-title">Food Log</h2>
               <div class="food-log-controls">
-                <button class="btn btn-fill btn-sm" onclick="openFoodModal()">+ Log Food</button>
+                <button class="btn btn-fill log-meal-header" type="button" onclick="openFoodModal()">Log a meal</button>
                 <input type="date" id="food-date-filter" class="form-input" style="padding:4px 8px; font-size:13px;" onchange="handleFoodDateChange(this.value)">
                 <span style="font-size:13px;color:var(--ink-muted);" id="food-entry-count">0 entries</span>
               </div>
             </div>
             <div id="food-log-list">
-              <div class="empty-food">No food logged yet.</div>
+              <div class="empty-food">No meals yet. Log a meal.</div>
             </div>
           </div>
         </div>
@@ -418,22 +515,22 @@
                   <div class="macro-card-target">Target: <span id="target-akg-p">130</span>g</div>
                 </div>
                 <div class="macro-card">
-                  <span class="macro-card-label">Karbohidrat</span>
+                  <span class="macro-card-label">Carbs</span>
                   <div class="macro-card-val"><span id="total-carbs">0</span>g</div>
                   <div class="macro-card-target">Target: <span id="target-akg-c">275</span>g</div>
                 </div>
                 <div class="macro-card">
-                  <span class="macro-card-label">Lemak</span>
+                  <span class="macro-card-label">Fat</span>
                   <div class="macro-card-val"><span id="total-fat">0</span>g</div>
                   <div class="macro-card-target">Target: <span id="target-akg-f">60</span>g</div>
                 </div>
                 <div class="macro-card">
-                  <span class="macro-card-label">Gula (Sugar)</span>
+                  <span class="macro-card-label">Sugar</span>
                   <div class="macro-card-val"><span id="total-sugar">0</span>g</div>
                   <div class="macro-card-target">Max: 30g</div>
                 </div>
                 <div class="macro-card" style="grid-column: span 2;">
-                  <span class="macro-card-label">Natrium (Na)</span>
+                  <span class="macro-card-label">Sodium</span>
                   <div class="macro-card-val"><span id="total-sodium">0</span>mg</div>
                   <div class="macro-card-target">Max: 2,000mg</div>
                 </div>
@@ -442,7 +539,7 @@
 
             <div class="macro-detail" style="margin-top:16px;">
               <div class="macro-detail-row">
-                <span>BB / TB Stats</span>
+                <span>Weight / height</span>
                 <span class="macro-detail-val"><span id="sidebar-bb">65</span> kg / <span id="sidebar-tb">171</span>
                   cm</span>
               </div>
@@ -456,11 +553,12 @@
               </div>
             </div>
 
-            <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:12px;" onclick="openBodyStatsModal()"><i
-                class="ph ph-pencil-simple" aria-hidden="true"></i> Nutrition Profile &amp; Integrasi</button>
+            <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:12px;" type="button" onclick="switchTab('profile')"><i
+                class="ph ph-pencil-simple" aria-hidden="true"></i> Edit profile</button>
           </div>
         </aside>
 
+      </div>
       </div>
     </div><!-- /tab-nutrition -->
 
@@ -501,7 +599,7 @@
     <div class="modal">
       <div class="modal-head">
         <div>
-          <h2 class="editorial modal-title" id="food-modal-title">Log Food</h2>
+          <h2 class="editorial modal-title" id="food-modal-title">Log a meal</h2>
           <p class="modal-subtitle">Photograph a meal or enter values. Review AI estimates before saving.</p>
         </div>
         <button class="btn btn-ghost btn-sm" type="button" onclick="closeFoodModal()" aria-label="Close food form"><i class="ph ph-x" aria-hidden="true"></i></button>
@@ -539,34 +637,53 @@
         </div>
         <div class="form-actions">
           <button type="button" class="btn btn-ghost" onclick="closeFoodModal()">Cancel</button>
-          <button type="submit" class="btn btn-fill" id="food-save-btn">Save Food</button>
+          <button type="submit" class="btn btn-fill" id="food-save-btn">Save</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- MODAL — Body Stats & AKG Calculator -->
-  <div class="overlay" id="bodystats-overlay" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
-    <div class="modal modal-wide">
-      <div class="modal-head">
-        <div><h2 class="editorial modal-title" id="profile-modal-title">Nutrition Profile</h2><p class="modal-subtitle">Only inputs that affect targets and recommendations.</p></div>
-        <button class="btn btn-ghost btn-sm" type="button" onclick="closeBodyStatsModal()" aria-label="Close nutrition profile"><i class="ph ph-x" aria-hidden="true"></i></button>
+  <div class="tab-panel" id="tab-profile">
+    <section data-guest-only class="page">
+      <div class="guest-banner">
+        <p class="dash-card-label">Profile</p>
+        <p>Body stats, goals, and Telegram live here. The fields below are examples.</p>
       </div>
-      <form onsubmit="handleBodyStatsSubmit(event)">
+      <div class="guest-sample">
+        <span class="sample-pill">Sample</span>
+        <div class="guest-sample-grid">
+          <div><span>Weight</span><input readonly value="65 kg" aria-label="Sample weight"></div>
+          <div><span>Height</span><input readonly value="170 cm" aria-label="Sample height"></div>
+          <div><span>Goal</span><input readonly value="Maintain" aria-label="Sample goal"></div>
+          <div><span>Telegram</span><input readonly value="Not connected" aria-label="Sample Telegram"></div>
+        </div>
+        <button class="btn btn-fill" type="button" onclick="handleBodyStatsSubmit(event)">Save</button>
+      </div>
+    </section>
+    <div data-authed-only>
+    <div class="page-heading-row">
+      <div>
+        <p class="eyebrow">Account</p>
+        <h1 class="editorial" id="profile-modal-title">Profile</h1>
+      </div>
+    </div>
+    <div class="profile-layout">
+      <form class="profile-card" onsubmit="handleBodyStatsSubmit(event)">
+        <h2 class="editorial">Body and target</h2>
         <div class="field-row">
           <div class="field">
-            <label for="inp-bb">Berat Badan (BB - kg)</label>
+            <label for="inp-bb">Weight (kg)</label>
             <input type="number" id="inp-bb" step="0.5" value="65" placeholder="65" oninput="recalcAKGPreview()"
               required>
           </div>
           <div class="field">
-            <label for="inp-tb">Tinggi Badan (TB - cm)</label>
+            <label for="inp-tb">Height (cm)</label>
             <input type="number" id="inp-tb" step="0.5" value="171" placeholder="171" oninput="recalcAKGPreview()"
               required>
           </div>
         </div>
         <div class="field">
-          <label for="inp-age">Umur (Tahun)</label>
+          <label for="inp-age">Age (years)</label>
           <input type="number" id="inp-age" value="25" placeholder="25" oninput="recalcAKGPreview()" required>
         </div>
         <div class="field-row">
@@ -605,34 +722,43 @@
           </div>
           <div class="akg-macros">
             <span>Protein: <strong id="akg-p-val">130g</strong></span>
-            <span>Karbo: <strong id="akg-c-val">275g</strong></span>
-            <span>Lemak: <strong id="akg-f-val">60g</strong></span>
+            <span>Carbs: <strong id="akg-c-val">275g</strong></span>
+            <span>Fat: <strong id="akg-f-val">60g</strong></span>
           </div>
         </div>
-
-        <section class="integration-box" aria-labelledby="integration-title">
-          <div class="integration-copy">
-            <p class="dash-card-label">Integrasi</p>
-            <h3 id="integration-title">Catat makanan lewat Telegram</h3>
-            <p id="telegram-status" role="status" aria-live="polite">Memeriksa status koneksi…</p>
-            <p class="integration-help">Buat link, buka di aplikasi Telegram, lalu tekan <strong>START</strong>. Foto atau deskripsi makanan akan masuk ke Calora setelah kamu menyetujui hasilnya.</p>
-            <div class="telegram-link-actions" id="telegram-link-actions" hidden>
-              <div class="integration-actions">
-                <a class="btn btn-fill" id="telegram-open-link" href="#" target="_blank" rel="noopener noreferrer">Buka Telegram</a>
-                <button type="button" class="btn btn-ghost" onclick="copyTelegramCommand()">Salin perintah /start</button>
-              </div>
-              <input class="telegram-command" id="telegram-start-command" type="text" readonly aria-label="Perintah koneksi Telegram" onclick="this.select()">
-              <small id="telegram-link-expiry"></small>
-            </div>
-          </div>
-          <button type="button" class="btn btn-ghost" id="telegram-connect-btn" onclick="connectTelegram()">Buat Link Telegram</button>
-        </section>
 
         <div class="form-actions">
           <button type="button" class="btn btn-ghost" onclick="closeBodyStatsModal()">Cancel</button>
-          <button type="submit" class="btn btn-fill" id="profile-save-btn">Save Profile</button>
+          <button type="submit" class="btn btn-fill" id="profile-save-btn">Save</button>
         </div>
       </form>
+
+      <section class="profile-card integration-box" aria-labelledby="integration-title">
+        <div class="integration-copy">
+          <p class="dash-card-label">Telegram</p>
+          <h2 class="editorial" id="integration-title">Log meals in Telegram</h2>
+          <p id="telegram-status" role="status" aria-live="polite">Checking connection…</p>
+          <p class="integration-help">Create a link, open it in Telegram, then press <strong>START</strong>. A photo or description is saved after you confirm it.</p>
+          <div class="telegram-link-actions" id="telegram-link-actions" hidden>
+            <div class="integration-actions">
+              <a class="btn btn-ghost" id="telegram-open-link" href="#" target="_blank" rel="noopener noreferrer">Open Telegram</a>
+              <button type="button" class="btn btn-ghost" onclick="copyTelegramCommand()">Copy /start command</button>
+            </div>
+            <input class="telegram-command" id="telegram-start-command" type="text" readonly aria-label="Telegram connection command" onclick="this.select()">
+            <small id="telegram-link-expiry"></small>
+          </div>
+        </div>
+        <button type="button" class="btn btn-ghost" id="telegram-connect-btn" onclick="connectTelegram()">Create Telegram link</button>
+      </section>
+
+      <section class="profile-card">
+        <h2 class="editorial">Account</h2>
+        <p class="text-sm text-ink-muted" id="profile-account-name">Guest</p>
+        <div class="form-actions">
+          <button class="btn btn-ghost" id="profile-session-button" type="button" onclick="lockApp()">Sign out</button>
+        </div>
+      </section>
+    </div>
     </div>
   </div>
 
@@ -675,7 +801,7 @@
         <label class="login-label" for="login-password">Password</label>
         <input class="login-input" id="login-password" type="password" autocomplete="current-password" placeholder=""
           onkeydown="if(event.key==='Enter') submitPassword()">
-        <button class="login-btn" id="login-unlock-btn" onclick="submitPassword()">Unlock</button>
+        <button class="login-btn" id="login-unlock-btn" onclick="submitPassword()">Sign in</button>
       </div>
 
       <p class="login-error" id="login-error-msg"></p>
@@ -686,7 +812,7 @@
   <!-- TOAST CONTAINER -->
   <div class="toast-container" id="toast-container"></div>
 
-  <script type="module" src="js/main.js?v=1.4.0"></script>
+  <script type="module" src="js/main.js?v=1.4.1"></script>
 </body>
 
 </html>

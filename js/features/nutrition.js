@@ -5,6 +5,7 @@ import { showToast } from '../ui/toast.js';
 import { closeFoodModal, showConfirmModal } from '../ui/modal.js';
 import { updateTrendChart } from './analytics.js';
 import { renderDashboardOverview } from './dashboard.js';
+import { requireAuth } from '../ui/guest.js';
 
 let selectedDate = new Date();
 
@@ -61,7 +62,7 @@ export function renderFoodLog() {
   const container = document.getElementById('food-log-list');
   if (!container) return;
   if (!entries.length) {
-    container.innerHTML = '<div class="empty-food">No food entries for this date.</div>';
+    container.innerHTML = '<div class="empty-food">No meals yet. Log a meal.</div>';
     return;
   }
   container.innerHTML = entries.slice().reverse().map(entry => `
@@ -102,6 +103,7 @@ export function deleteFoodLogEntry(id) {
 }
 
 export async function saveManualFoodLog(event) {
+  if (!requireAuth(event)) return;
   event?.preventDefault();
   const button = document.getElementById('food-save-btn');
   const entry = {
@@ -133,7 +135,7 @@ export async function saveManualFoodLog(event) {
   } catch (error) { showToast(error.message, 'danger'); }
   finally {
     button.disabled = false;
-    button.textContent = 'Save Food';
+    button.textContent = 'Save';
   }
 }
 
@@ -166,6 +168,7 @@ export function handleFoodDateChange(value) {
 }
 
 export async function analyzeFoodPhoto(event) {
+  if (!requireAuth(event)) return;
   const file = event.target.files?.[0];
   if (!file) return;
   const button = document.getElementById('food-analyze-btn');

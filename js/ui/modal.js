@@ -3,11 +3,13 @@
 // ==========================================================================
 
 import { state } from '../state.js';
+import { requireAuth } from './guest.js';
 import { calculateNutritionTargets } from '../domain/nutrition.mjs';
 
 let confirmCallback = null;
 
 export function openModal() {
+  if (!requireAuth()) return;
   const overlay = document.getElementById('log-overlay');
   if (overlay) overlay.classList.add('open');
 }
@@ -18,6 +20,7 @@ export function closeModal() {
 }
 
 export function openFoodModal() {
+  if (!requireAuth()) return;
   const overlay = document.getElementById('food-overlay');
   if (overlay) overlay.classList.add('open');
   setTimeout(() => document.getElementById('food-name-input')?.focus(), 100);
@@ -69,15 +72,11 @@ export function openBodyStatsModal() {
   if (targetWeightInput && !targetWeightInput.value) targetWeightInput.value = state.bodyStats.bb || 65;
 
   recalcAKGPreview();
-
-  const overlay = document.getElementById('bodystats-overlay');
-  if (overlay) overlay.classList.add('open');
   import('../features/integrations.js').then(module => module.loadTelegramStatus());
 }
 
 export function closeBodyStatsModal() {
-  const overlay = document.getElementById('bodystats-overlay');
-  if (overlay) overlay.classList.remove('open');
+  openBodyStatsModal();
 }
 
 export function showConfirmModal({ title = 'Confirm Action', message, actionText = 'Confirm', isDanger = false, onConfirm }) {
@@ -113,7 +112,7 @@ export function initModalListeners() {
     });
   }
 
-  ['log-overlay', 'food-overlay', 'confirm-overlay', 'bodystats-overlay'].forEach(id => {
+  ['log-overlay', 'food-overlay', 'confirm-overlay'].forEach(id => {
     const el = document.getElementById(id);
     if (el) {
       el.addEventListener('click', e => {
@@ -121,7 +120,6 @@ export function initModalListeners() {
           if (id === 'log-overlay') closeModal();
           if (id === 'food-overlay') closeFoodModal();
           if (id === 'confirm-overlay') closeConfirmModal();
-          if (id === 'bodystats-overlay') closeBodyStatsModal();
         }
       });
     }

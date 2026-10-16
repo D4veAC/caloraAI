@@ -22,18 +22,18 @@ export async function checkAuth() {
       applyAuthenticatedUser(user);
       await syncAdaptiveDashboard();
       const next = tabFromPath();
-      _rawSwitchTab(next === 'welcome' ? 'dashboard' : next, true);
+      _rawSwitchTab(next, true);
       return true;
     }
   } catch {}
   state.setCurrentUser(null, null, null);
-  _rawSwitchTab('welcome', true);
+  const next = tabFromPath();
+  _rawSwitchTab(next, true);
   return false;
 }
 
 export function closeLoginOverlay() {
   document.getElementById('pin-lock-overlay')?.classList.remove('open', 'unlocking');
-  _rawSwitchTab('welcome');
 }
 
 export function openLoginOverlay() {
@@ -79,7 +79,8 @@ export async function submitPassword() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: _loginUsername, password: passwordInput.value })
     });
-    const payload = await response.json();
+    let payload = {};
+    try { payload = await response.json(); } catch { payload = {}; }
     if (!response.ok) throw new Error(payload.error || 'Unable to sign in');
     applyAuthenticatedUser(payload.user);
     document.getElementById('pin-lock-overlay')?.classList.remove('open');
@@ -91,10 +92,10 @@ export async function submitPassword() {
     showToast(`Welcome back, ${payload.user.name}`, 'success');
   } catch (loginError) {
     passwordInput.value = '';
-    error.textContent = loginError.message;
+    error.textContent = loginError instanceof TypeError ? 'The server is not running' : loginError.message;
   } finally {
     button.disabled = false;
-    button.textContent = 'Unlock';
+    button.textContent = 'Sign in';
   }
 }
 
@@ -103,6 +104,6 @@ export async function lockApp() {
   state.setCurrentUser(null, null, null);
   state.pendingTab = 'dashboard';
   updateNavUserDisplay();
-  _rawSwitchTab('welcome');
+  _rawSwitchTab('dashboard');
   showToast('Logged out', 'info');
 }

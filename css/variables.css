@@ -1,25 +1,32 @@
 /* ==========================================================================
-   FITVAULT — Design Tokens, Variables & Base Reset
+   CALORA — Design Tokens
    ========================================================================== */
 
 :root {
-  --bg:          #111009;
-  --surface:     #1c1a17;
-  --surface-2:   #242118;
-  --border:      #2e2b26;
-  --border-2:    #3d3930;
+  --bg:          #7eb85f;
+  --bg-end:      #f6c56b;
+  --surface:     #fff6ea;
+  --surface-2:   #fffaf3;
+  --border:      #3a2a1a;
+  --border-2:    #6b5344;
+  --line:        rgba(58, 42, 26, 0.16);
+  --shadow:      0 10px 24px rgba(58, 42, 26, 0.12);
 
-  --ink:         #f7f1e8;
-  --ink-muted:   #9c9488;
-  --ink-faint:   #4a4741;
+  --ink:         #3a2a1a;
+  --ink-muted:   #6b5344;
+  --ink-faint:   #8a7564;
+  --nav:         #3a2a1a;
+  --nav-ink:     #f6f0dc;
 
-  --accent:      #d4c9b4;
-  --success:     #4caf78;
-  --danger:      #e05252;
+  --accent:      #e24b32;
+  --accent-ink:  #fff8ee;
+  --orange:      #e07a2f;
+  --success:     #2f7d4a;
+  --danger:      #9b2c2c;
 
-  --r-sm:  4px;
-  --r-md:  6px;
-  --r-lg:  12px;
+  --r-sm:  8px;
+  --r-md:  12px;
+  --r-lg:  20px;
   --r-pill: 9999px;
 
   --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
@@ -35,7 +42,8 @@
 }
 
 html, body {
-  background: var(--bg);
+  background: linear-gradient(180deg, var(--bg) 0%, #f0a56a 48%, var(--bg-end) 100%);
+  background-attachment: fixed;
   color: var(--ink);
   font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
   font-size: 14px;
@@ -43,13 +51,13 @@ html, body {
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
   overflow-x: hidden;
-  overflow-y: scroll; /* Force scrollbar to prevent layout stretch on load */
+  overflow-y: scroll;
   padding-top: 0;
 }
 
 .editorial {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  font-weight: 300;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
+  font-family: 'Luckiest Guy', 'DM Sans', sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.25;
 }

@@ -35,24 +35,16 @@ export function updateNavIndicator() {
 
 export function updateNavUserDisplay() {
   const nameEl = document.getElementById('nav-user-name');
-  const profileBtn = document.getElementById('nav-profile-button');
-  const lockBtn = document.getElementById('nav-session-button');
+  const accountEl = document.getElementById('profile-account-name');
+  const sessionBtn = document.getElementById('profile-session-button');
+  const signedIn = Boolean(state.currentUser);
+  document.body.classList.toggle('is-authed', signedIn);
 
-  if (state.currentUser) {
-    if (nameEl) nameEl.textContent = state.currentUser;
-    if (profileBtn) profileBtn.hidden = false;
-    if (lockBtn) {
-      lockBtn.textContent = 'Lock';
-      lockBtn.onclick = () => window.lockApp();
-      lockBtn.className = 'btn btn-ghost btn-sm';
-    }
-  } else {
-    if (nameEl) nameEl.textContent = 'Guest';
-    if (profileBtn) profileBtn.hidden = true;
-    if (lockBtn) {
-      lockBtn.textContent = 'Login';
-      lockBtn.onclick = () => window.switchTab('dashboard');
-      lockBtn.className = 'btn btn-fill btn-sm';
-    }
+  if (nameEl) nameEl.textContent = signedIn ? state.currentUser : 'Guest';
+  if (accountEl) accountEl.textContent = signedIn ? state.currentUser : 'Guest';
+  if (sessionBtn) {
+    sessionBtn.textContent = signedIn ? 'Sign out' : 'Sign in';
+    sessionBtn.onclick = () => signedIn ? window.lockApp() : window.openLoginOverlay();
   }
+  requestAnimationFrame(updateNavIndicator);
 }

@@ -116,11 +116,11 @@
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  border-bottom: 1px solid rgba(247, 241, 232, 0.08);
+  border-bottom: 1px solid var(--line);
 }
 
 .set-table td {
-  border-bottom: 1px solid rgba(247, 241, 232, 0.04);
+  border-bottom: 1px solid var(--line);
 }
 
 .set-table tr:last-child td {
@@ -152,9 +152,10 @@
 .chart-filters {
   display: flex;
   gap: 6px;
-  background: var(--bg);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
   padding: 4px;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-pill);
 }
 
 .chart-filter-btn {
@@ -164,14 +165,14 @@
   font-size: 11px;
   font-family: inherit;
   padding: 4px 10px;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-pill);
   cursor: pointer;
   transition: all var(--t-fast);
 }
 
 .chart-filter-btn.active {
-  background: var(--surface-2);
-  color: var(--ink);
+  background: var(--accent);
+  color: var(--accent-ink);
 }
 
 .chart-wrapper {

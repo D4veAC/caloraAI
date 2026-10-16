@@ -13,7 +13,11 @@ Open `http://localhost:3005`. Admins use `http://localhost:3005/admin`.
 
 ## Local development
 
-Postgres 16 and Node 22.5+ are required.
+Postgres 16 and Node 22.5+ are required. Start Postgres, then run the API on the host.
+
+```
+docker compose up postgres
+```
 
 ```
 cp .env.example .env
@@ -21,10 +25,12 @@ npm install
 npx prisma migrate deploy
 npx prisma generate
 npm run css:build
-npm run start:dev
+npm run dev
 ```
 
-Development Dave/1234, Alex/5678, Aifih/1414, and Admin/2468 accounts are seeded when `NODE_ENV` is not production.
+Open `http://localhost:3005`.
+
+Dave/1234, Alex/5678, Aifih/1414, and Admin/2468 are created when `NODE_ENV` is not production and `CALORA_USERS_JSON` is unset. When that variable is set, those names are not created.
 
 ## Telegram bot
 

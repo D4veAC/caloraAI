@@ -70,7 +70,7 @@
 }
 
 .macro-card-val {
-  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-family: 'Luckiest Guy', 'DM Sans', sans-serif;
   font-size: 24px;
   font-weight: 400;
   color: var(--ink);
@@ -119,13 +119,12 @@
 
 .empty-food {
   background: var(--surface);
-  border: none;
-  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+  border-radius: 20px 20px 20px 6px;
   padding: 32px;
   text-align: center;
-  color: var(--ink-muted);
+  color: var(--ink);
   font-size: 14px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
 }
 
 .food-log-card {
@@ -179,7 +178,7 @@
 }
 
 .scan-dropzone {
-  border: 2px dashed rgba(247, 241, 232, 0.15);
+  border: 2px dashed var(--line);
   border-radius: var(--r-lg);
   padding: 32px;
   text-align: center;

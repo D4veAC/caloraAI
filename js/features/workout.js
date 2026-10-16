@@ -8,17 +8,33 @@ import { showToast } from '../ui/toast.js';
 import { showConfirmModal, closeModal, closeBodyStatsModal } from '../ui/modal.js';
 import { updateWorkoutChart } from './analytics.js';
 import { renderDashboardOverview } from './dashboard.js';
+import { requireAuth } from '../ui/guest.js';
 
 let timerInterval = null;
 let currentWorkoutFilter = 'ALL';
 
 // ── TIMER ─────────────────────────────────────────────────────────────────────
 
+function syncSessionButtons() {
+  const startBtn = document.getElementById('btn-timer-toggle');
+  const endBtn = document.getElementById('btn-end-session');
+  const active = state.timerRunning || state.timerSec > 0;
+  if (startBtn) {
+    startBtn.textContent = state.timerRunning ? 'Pause' : (state.timerSec > 0 ? 'Resume' : 'Start session');
+    startBtn.classList.toggle('btn-fill', !active);
+    startBtn.classList.toggle('btn-ghost', active);
+  }
+  if (endBtn) {
+    endBtn.hidden = !active;
+    endBtn.classList.toggle('btn-fill', active);
+    endBtn.classList.toggle('btn-ghost', !active);
+  }
+}
+
 export function toggleTimer() {
-  const btn = document.getElementById('btn-timer-toggle');
+  if (!requireAuth()) return;
   if (!state.timerRunning) {
     state.timerRunning = true;
-    if (btn) btn.textContent = 'Pause';
     showToast('Session timer started', 'info');
     timerInterval = setInterval(() => {
       state.setTimerSec(state.timerSec + 1);
@@ -26,11 +42,11 @@ export function toggleTimer() {
     }, 1000);
   } else {
     state.timerRunning = false;
-    if (btn) btn.textContent = 'Resume';
     clearInterval(timerInterval);
     timerInterval = null;
     showToast('Session timer paused', 'info');
   }
+  syncSessionButtons();
 }
 
 export function updateTimerDisplay() {
@@ -39,6 +55,7 @@ export function updateTimerDisplay() {
 }
 
 export function promptEndSession() {
+  if (!requireAuth()) return;
   if (state.timerSec === 0) { showToast('No active timer to end', 'info'); return; }
   showConfirmModal({
     title: 'End Workout Session',
@@ -52,19 +69,22 @@ export async function endSession() {
   state.timerRunning = false;
   clearInterval(timerInterval);
   timerInterval = null;
-  const btn = document.getElementById('btn-timer-toggle');
-  if (btn) btn.textContent = 'Start';
   const durationMin = Math.round(state.timerSec / 60);
   const response = await fetch('/api/activity', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ activityType:'WORKOUT', name:'Workout Session', startedAt:new Date().toISOString(), durationSeconds:state.timerSec, dataQuality:'USER_REPORTED' }) });
-  if (!response.ok) return showToast('Workout session could not be saved', 'danger');
+  if (!response.ok) {
+    syncSessionButtons();
+    return showToast('Workout session could not be saved', 'danger');
+  }
   state.setTimerSec(0);
   updateTimerDisplay();
+  syncSessionButtons();
   showToast(`Session completed (${durationMin} mins logged)`, 'success');
   await syncWebhookWorkouts();
   renderDashboardOverview();
 }
 
 export async function syncWebhookWorkouts() {
+  if (!state.currentUser) return;
   try {
     const res = await fetch('/api/activity');
     if (!res.ok) return;
@@ -91,6 +111,7 @@ export async function syncWebhookWorkouts() {
 
 export function syncTimers() {
   updateTimerDisplay();
+  syncSessionButtons();
 }
 
 // ── WORKOUT LOG FILTER ────────────────────────────────────────────────────────
@@ -210,6 +231,7 @@ export function deleteExerciseEntry(id) {
 }
 
 export async function handleLogSubmit(e) {
+  if (!requireAuth(e)) return;
   if (e) e.preventDefault();
   const nameInput   = document.getElementById('inp-exercise');
   const weightInput = document.getElementById('inp-weight');
@@ -237,6 +259,7 @@ export async function handleLogSubmit(e) {
 }
 
 export async function handleBodyStatsSubmit(e) {
+  if (!requireAuth(e)) return;
   if (e) e.preventDefault();
   const profile = {
     bb: Number(document.getElementById('inp-bb')?.value),
@@ -265,7 +288,7 @@ export async function handleBodyStatsSubmit(e) {
   } catch (error) { showToast(error.message, 'danger'); }
   finally {
     button.disabled = false;
-    button.textContent = 'Save Profile';
+    button.textContent = 'Save';
   }
 }
 

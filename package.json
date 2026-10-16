@@ -4,6 +4,7 @@
   "version": "2.0.0",
   "scripts": {
     "start": "node dist/main.js",
+    "dev": "nest start --watch",
     "start:dev": "tsc -p tsconfig.build.json --watch",
     "build": "tsc -p tsconfig.build.json && npm run css:build",
     "css:build": "tailwindcss -i ./css/input.css -o ./css/app.css",

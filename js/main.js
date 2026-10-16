@@ -11,11 +11,11 @@ import { renderDashboardOverview, syncAdaptiveDashboard } from './features/dashb
 import { renderWorkouts, syncTimers, setWorkoutLogFilter, syncWebhookWorkouts } from './features/workout.js';
 import { renderFoodLog, syncRemoteFoodLogs } from './features/nutrition.js';
 import { updateTrendChart, updateWorkoutChart, changeChartTimeframe } from './features/analytics.js';
-import { initDashCanvas, initThreeJS } from './features/scene3d.js';
 import { renderTrends, saveWeightLog } from './features/trends.js';
 import { connectTelegram, copyTelegramCommand, loadTelegramStatus } from './features/integrations.js';
 
 // ── Global handlers for HTML inline onclick attributes ────────────────────────
+window.goHome = () => switchTab('dashboard');
 window.switchTab            = switchTab;
 window._rawSwitchTab        = _rawSwitchTab;
 window.openDashboardWithAuth = () => switchTab('dashboard');
@@ -30,6 +30,7 @@ window.loginGoBack          = loginGoBack;
 window.submitPassword       = submitPassword;
 window.lockApp              = lockApp;
 window.closeLoginOverlay    = closeLoginOverlay;
+window.openLoginOverlay     = openLoginOverlay;
 window.setWorkoutLogFilter  = setWorkoutLogFilter;
 window.changeChartTimeframe = changeChartTimeframe;
 window.updateWorkoutChart   = updateWorkoutChart;
@@ -48,7 +49,9 @@ if (!window.__FITVAULT_BOOTSTRAPPED__) {
 
     // 2. Auth check — always redirects to welcome (currentUser is null on boot)
     await checkAuth();
-    window.addEventListener('focus', loadTelegramStatus);
+    window.addEventListener('focus', () => {
+      if (state.currentUser) loadTelegramStatus();
+    });
 
     // 3. Data rendering (renders to hidden DOM, no tab switch)
     renderWorkouts();
@@ -63,6 +66,7 @@ if (!window.__FITVAULT_BOOTSTRAPPED__) {
 
     // 5. Charts render after a short delay (canvases need to be visible first)
     setTimeout(() => {
+      if (!state.currentUser) return;
       updateTrendChart();
       updateWorkoutChart();
     }, 500);

@@ -8,7 +8,7 @@
   align-items: flex-end;
   margin-bottom: 36px;
   padding-bottom: 28px;
-  border-bottom: 1px solid rgba(247, 241, 232, 0.08);
+  border-bottom: 1px solid var(--line);
 }
 
 .dash-eyebrow {
@@ -21,8 +21,8 @@
 
 .dash-greeting-h1 {
   font-size: 44px;
-  font-weight: 300;
-  line-height: 1;
+  font-weight: 400;
+  line-height: 1.15;
 }
 
 .dash-actions {
@@ -39,9 +39,43 @@
   margin-bottom: 20px;
 }
 
+.dash-kcal-card,
+.dash-train-card,
+.dash-tile,
+.dash-section,
+.dash-catering,
+.dash-adaptive-card,
+.trend-chart-card,
+.summary-card,
+.timer-strip,
+.sidebar-section,
+.macro-card,
+.food-log-card {
+  border: 1px solid var(--border);
+}
+
+.dash-more,
+.dash-why {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 16px 20px;
+  margin: 16px 0;
+}
+
+.dash-more summary,
+.dash-why summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.today-strip {
+  margin: 16px 0 8px;
+}
+
 .dash-kcal-card {
   background: var(--surface);
-  border: none;
+  border: 1px solid var(--border);
   border-radius: var(--r-lg);
   padding: 28px 32px;
   display: flex;
@@ -66,8 +100,8 @@
 }
 
 .dash-kcal-main {
-  font-size: 60px;
-  font-weight: 300;
+  font-size: 56px;
+  font-weight: 400;
   line-height: 1;
 }
 
@@ -86,7 +120,7 @@
 .dash-kcal-bar-track {
   flex: 1;
   height: 4px;
-  background: rgba(247, 241, 232, 0.08);
+  background: var(--line);
   border-radius: 2px;
   overflow: hidden;
 }
@@ -160,7 +194,7 @@
 .dash-train-stat-divider {
   width: 1px;
   height: 28px;
-  background: rgba(247, 241, 232, 0.08);
+  background: var(--line);
   flex-shrink: 0;
 }
 
@@ -212,7 +246,7 @@
 
 .dash-macro-track {
   height: 3px;
-  background: rgba(247, 241, 232, 0.08);
+  background: var(--line);
   border-radius: 2px;
   overflow: hidden;
 }
@@ -261,7 +295,7 @@
 
 .dash-tile-val {
   font-size: 28px;
-  font-weight: 300;
+  font-weight: 400;
   line-height: 1.1;
   margin-bottom: 4px;
   color: var(--ink);
@@ -314,8 +348,8 @@
   margin-bottom: 16px;
   padding: 28px;
   border-radius: var(--r-lg);
-  background: linear-gradient(135deg, rgba(184, 255, 44, 0.1), var(--surface));
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  background: var(--surface);
+  box-shadow: var(--shadow);
 }
 
 .dash-catering-head {
@@ -337,7 +371,8 @@
 .dash-catering-grid > div {
   padding: 16px;
   border-radius: var(--r-md);
-  background: rgba(0, 0, 0, 0.18);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -346,7 +381,7 @@
 .dash-catering-grid span,
 .dash-catering-grid small { color: var(--ink-muted); font-size: 12px; }
 .dash-catering-grid strong { color: var(--ink); font-size: 16px; line-height: 1.35; }
-.dash-catering-adjustment { margin-top: 16px; color: var(--accent); font-size: 13px; text-transform: capitalize; }
+.dash-catering-adjustment { margin-top: 16px; color: var(--ink); font-size: 13px; text-transform: capitalize; }
 .dash-why-card { margin-bottom: 20px; }
 .dash-why-card .dash-insight + .dash-insight { margin-top: 12px; }
 
@@ -390,7 +425,7 @@
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 16px;
-  border-bottom: 1px solid rgba(247, 241, 232, 0.08);
+  border-bottom: 1px solid var(--line);
 }
 
 .dash-section-link {
@@ -409,7 +444,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px 0;
-  border-bottom: 1px solid rgba(247, 241, 232, 0.06);
+  border-bottom: 1px solid var(--line);
 }
 
 .dash-food-row:last-child, .dash-workout-row:last-child {

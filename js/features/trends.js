@@ -1,6 +1,7 @@
 import { state } from '../state.js';
 import { showToast } from '../ui/toast.js';
 import { syncAdaptiveDashboard } from './dashboard.js';
+import { requireAuth } from '../ui/guest.js';
 
 const setText = (id, value) => { const element = document.getElementById(id); if (element) element.textContent = value; };
 
@@ -16,6 +17,7 @@ export function renderTrends() {
 }
 
 export async function saveWeightLog(event) {
+  if (!requireAuth(event)) return;
   event.preventDefault();
   const input = document.getElementById('trend-weight-input');
   const response = await fetch('/api/weight', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ weightKg:Number(input.value), measuredAt:new Date().toISOString(), source:'MANUAL' }) });
